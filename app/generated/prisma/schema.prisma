@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Submission {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String    @db.Uuid
+  test_id      String    @db.Uuid
+  user_answers Json
+  started_at   DateTime? @db.Timestamptz(6)
+  completed_at DateTime? @db.Timestamptz(6)
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+  test         Test      @relation(fields: [test_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user         User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("submissions")
+}
+
+model Test {
+  id                          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title                       String       @db.VarChar
+  description                 String?      @db.VarChar
+  questions                   Json
+  time_limit_minutes          Int?         @db.SmallInt
+  shuffle_questions           Boolean      @default(false)
+  number_of_questions_to_show Int?         @db.SmallInt
+  created_by                  String       @db.Uuid
+  created_at                  DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime     @default(now()) @db.Timestamptz(6)
+  submissions                 Submission[]
+  user                        User         @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("tests")
+}
+
+model User {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email           String       @unique
+  hashed_password String?
+  provider        String       @default("credentials")
+  provider_id     String?
+  name            String?
+  image           String?
+  role            String?      @default("user")
+  created_at      DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?    @default(now()) @db.Timestamptz(6)
+  submissions     Submission[]
+  tests           Test[]
+
+  @@map("users")
+}
