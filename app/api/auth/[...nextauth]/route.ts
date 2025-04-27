@@ -1,3 +1,4 @@
+import prisma from "@/prisma/client";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -9,7 +10,25 @@ export const authOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-};
+  callbacks: {
+    async signIn({ user }) {
+      // ユーザーが存在しない場合は作成
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email! },
+      });
+      if (!existingUser) {
+        await prisma.user.create({
+          data: {
+            email: user.email!,
+            name: user.name!,
+            image: user.image!,
+          },
+        });
+      }
+      return true;
+    }
+  }
+}
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
