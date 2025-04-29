@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import SessionWrapper from '@/components/SessionWrapper'
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { ModeToggle } from '@/components/ModeToggle'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,9 +26,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='en'>
+    <html lang='en' suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <SessionWrapper>{children}</SessionWrapper>
+        <SessionWrapper>
+          <ThemeProvider
+            attribute='class'
+            defaultTheme='system'
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ModeToggle />
+            {children}
+          </ThemeProvider>
+        </SessionWrapper>
       </body>
     </html>
   )
