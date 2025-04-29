@@ -1,6 +1,7 @@
 'use client'
 
 import { signIn, signOut, useSession } from 'next-auth/react'
+import { Button } from './ui/button'
 
 export default function AuthButton() {
   const { data: session } = useSession()
@@ -8,14 +9,18 @@ export default function AuthButton() {
     return (
       <div>
         <h1>こんにちは {session.user?.name} さん！</h1>
-        <button onClick={() => signOut()}>ログアウト</button>
+        <Button className='cursor-pointer' onClick={() => signOut()}>
+          ログアウト
+        </Button>
       </div>
     )
   } else {
     return (
       <div>
         <h1>ログインしてないよ</h1>
-        <button onClick={() => signIn('google')}>Googleでログイン</button>
+        <Button className='cursor-pointer' onClick={() => signIn('google')}>
+          Googleでログイン
+        </Button>
       </div>
     )
   }
