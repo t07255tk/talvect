@@ -9,7 +9,10 @@ export default function AuthButton() {
     return (
       <div>
         <h1>こんにちは {session.user?.name} さん！</h1>
-        <Button className='cursor-pointer' onClick={() => signOut()}>
+        <Button
+          className='cursor-pointer'
+          onClick={() => signOut({ callbackUrl: '/' })}
+        >
           ログアウト
         </Button>
       </div>

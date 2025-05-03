@@ -1,6 +1,8 @@
 import AuthButton from '@/components/AuthButton'
+import { requireAuth } from '@/lib/requreAuth'
 
-export default function Page() {
+export default async function Page() {
+  await requireAuth()
   return (
     <div>
       <AuthButton />
