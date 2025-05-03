@@ -1,8 +1,16 @@
 import { LoginForm } from '@/components/login-form'
 import { ModeToggle } from '@/components/ModeToggle'
 import Image from 'next/image'
+import { redirect } from 'next/navigation'
+import { authOptions } from './api/auth/[...nextauth]/route'
+import { getServerSession } from 'next-auth'
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getServerSession(authOptions)
+  if (session) {
+    redirect('/dashboard')
+  }
+
   return (
     <div className='grid min-h-svh lg:grid-cols-2'>
       <div className='relative hidden bg-muted lg:block'>

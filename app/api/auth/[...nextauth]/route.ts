@@ -11,9 +11,15 @@ export const authOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  async signIn({ user }: { user: User }) {
-    await createUserIfNotExists(user)
-    return true
+  callbacks: {
+    async signIn({ user }: { user: User }) {
+      await createUserIfNotExists(user)
+      return true
+    },
+
+    async redirect({ baseUrl }: { baseUrl: string }) {
+      return `${baseUrl}/dashboard`
+    },
   },
 }
 
