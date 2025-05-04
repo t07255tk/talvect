@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -8,20 +9,20 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Submission {
+model Response {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id      String    @db.Uuid
-  test_id      String    @db.Uuid
+  quiz_id      String    @db.Uuid
   user_answers Json
   started_at   DateTime? @db.Timestamptz(6)
   completed_at DateTime? @db.Timestamptz(6)
   created_at   DateTime? @default(now()) @db.Timestamptz(6)
-  test         Test      @relation(fields: [test_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quiz         Quiz      @relation(fields: [quiz_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user         User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  @@map("submissions")
+  @@map("responses")
 }
 
-model Test {
+model Quiz {
   id                          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title                       String        @db.VarChar
   description                 String?       @db.VarChar
@@ -32,9 +33,9 @@ model Test {
   created_by                  String        @db.Uuid
   created_at                  DateTime      @default(now()) @db.Timestamptz(6)
   updated_at                  DateTime      @default(now()) @db.Timestamptz(6)
-  submissions                 Submission[]
+  responses                   Response[]
   user                        User          @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  @@map("tests")
+  @@map("quizzes")
 }
 
 model User {
@@ -48,7 +49,7 @@ model User {
   role            String?       @default("user")
   created_at      DateTime?     @default(now()) @db.Timestamptz(6)
   updated_at      DateTime?     @default(now()) @db.Timestamptz(6)
-  submissions     Submission[]
-  tests           Test[]
+  responses       Response[]
+  quizzes         Quiz[]
   @@map("users")
 }
