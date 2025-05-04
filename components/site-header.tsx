@@ -9,7 +9,7 @@ export default function Header() {
   return (
     <header className='flex p-2 border-b'>
       <nav className='w-full flex items-center justify-between'>
-        <span className='font-bold'>DiscoverLink</span>
+        <span className='font-bold'>Evalent8</span>
         <div className='flex gap-2'>
           <ModeToggle />
           <Avatar>

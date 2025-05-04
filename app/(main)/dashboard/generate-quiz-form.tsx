@@ -25,10 +25,10 @@ export default function GenerateQuizForm() {
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder='e.g. "Sales quiz for applicants", or paste a job description URL.'
+          placeholder='e.g. Generate a sales quiz for candidates, or paste a job description URL.'
         />
         <Button className='cursor-pointer' onClick={handleSend}>
-          Send
+          Generate Quiz
         </Button>
       </div>
     </div>
