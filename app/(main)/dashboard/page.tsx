@@ -1,5 +1,5 @@
 import { requireAuth } from '@/lib/requreAuth'
-import GenerateAssessmentForm from './generate-assessment-form'
+import GenerateAssessmentForm from './GenerateAssessmentForm'
 
 export default async function Page() {
   await requireAuth()
