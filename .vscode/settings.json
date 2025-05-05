@@ -1,0 +1,9 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.addMissingImports": "always",
+    "source.fixAll.eslint": "always"
+  },
+  "eslint.useFlatConfig": true,
+  "typescript.updateImportsOnFileMove.enabled": "prompt"
+}
