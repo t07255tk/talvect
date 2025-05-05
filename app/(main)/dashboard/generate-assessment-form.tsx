@@ -5,18 +5,26 @@ import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-export default function GenerateQuizForm() {
+export default function GenerateAssessmentForm() {
   const [text, setText] = useState('')
   const router = useRouter()
 
   const handleSend = async () => {
-    const res = await fetch('/api/create-quiz', {
+    const res = await fetch('/api/generate-assessment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),
     })
-    const { id } = await res.json()
-    router.push(`/quiz/${id}`)
+
+    if (!res.ok) {
+      console.error('Failed to generate assessment')
+      return
+    }
+
+    const data = await res.json()
+    const { id } = data
+
+    router.push(`/assessments/${id}`)
   }
 
   return (
@@ -25,10 +33,10 @@ export default function GenerateQuizForm() {
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder='e.g. Generate a sales quiz for candidates, or paste a job description URL.'
+          placeholder='e.g. Generate an assessment for sales candidates or paste a job description URL.'
         />
         <Button className='cursor-pointer' onClick={handleSend}>
-          Generate Quiz
+          Generate Assessment
         </Button>
       </div>
     </div>

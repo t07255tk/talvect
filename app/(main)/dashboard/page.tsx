@@ -1,5 +1,5 @@
 import { requireAuth } from '@/lib/requreAuth'
-import GenerateQuizForm from './generate-quiz-form'
+import GenerateAssessmentForm from './generate-assessment-form'
 
 export default async function Page() {
   await requireAuth()
@@ -11,16 +11,16 @@ export default async function Page() {
           Evaluate talent. Instantly.
         </div>
         <p className='text-muted-foreground text-sm mt-2'>
-          Enter a topic or paste a URL — Evalent8 will generate a smart quiz you
-          can use to screen, train, or assess.
+          Enter a topic or paste a URL — Evalent8 will generate a smart
+          assessment you can use to screen, train, or evaluate talent.
         </p>
         <p className='text-sm text-muted-foreground mt-1'>
           No setup, no forms — just describe what you want to ask. You can
-          refine the quiz anytime.
+          refine the assessment anytime.
         </p>
       </div>
       <div className='lg:w-1/2 md:w-2/3 w-full'>
-        <GenerateQuizForm />
+        <GenerateAssessmentForm />
       </div>
     </div>
   )
