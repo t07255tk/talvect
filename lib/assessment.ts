@@ -1,12 +1,13 @@
+import OpenAI from 'openai'
 import {
   AssessmentItem,
   AssessmentItemArraySchema,
 } from '@/lib/validation/assessmentSchema'
+import { TagDto } from '@/types/tag'
 import { generateAssessmentPrompt } from './assessmentPrompt'
-import OpenAI from 'openai'
 
 export async function generateAssessment(
-  input: string,
+  tags: TagDto[],
   openaiInstance?: OpenAI,
 ): Promise<AssessmentItem[]> {
   const openai =
@@ -15,7 +16,7 @@ export async function generateAssessment(
       apiKey: process.env.OPENAI_API_KEY!,
     })
 
-  const prompt = generateAssessmentPrompt(input)
+  const prompt = generateAssessmentPrompt(tags)
 
   try {
     const res = await openai.chat.completions.create({
@@ -39,7 +40,6 @@ export async function generateAssessment(
     }
 
     const parsed = JSON.parse(jsonText)
-
     const result = AssessmentItemArraySchema.safeParse(parsed)
     if (!result.success) {
       console.error('Validation failed:', result.error.format())

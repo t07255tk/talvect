@@ -6,6 +6,7 @@ export const MultipleChoiceItemSchema = z.object({
   choices: z.array(z.string()).length(4),
   answer: z.string(),
   explanation: z.string().optional(),
+  tags: z.array(z.string()).min(1).max(3),
 })
 
 export const EssayItemSchema = z.object({

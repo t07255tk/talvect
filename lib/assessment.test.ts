@@ -1,7 +1,24 @@
-import { describe, it, expect, vi } from 'vitest'
-import { generateAssessment } from './generateAssessment'
 import OpenAI from 'openai'
+import { describe, it, expect, vi } from 'vitest'
+import { generateAssessment } from './assessment'
 
+const testTags = [
+  {
+    id: '1',
+    name: 'JavaScript',
+    description: 'A programming language for web development',
+  },
+  {
+    id: '2',
+    name: 'Python',
+    description: 'A programming language for data science',
+  },
+  {
+    id: '3',
+    name: 'Java',
+    description: 'A programming language for enterprise applications',
+  },
+]
 describe('generateAssessment', () => {
   it('should return valid AssessmentItems when GPT responds correctly', async () => {
     const mockCreate = vi.fn().mockResolvedValue({
@@ -15,6 +32,7 @@ describe('generateAssessment', () => {
                 choices: ['3', '4', '5', '6'],
                 answer: '4',
                 explanation: 'Basic math',
+                tags: ['1', '2'],
               },
             ]),
           },
@@ -30,7 +48,7 @@ describe('generateAssessment', () => {
       },
     } as unknown as OpenAI
 
-    const result = await generateAssessment('math', mockOpenAI)
+    const result = await generateAssessment(testTags, mockOpenAI)
     expect(result).toHaveLength(1)
     expect(result[0].question).toBe('What is 2+2?')
   })
@@ -52,7 +70,7 @@ describe('generateAssessment', () => {
       },
     } as unknown as OpenAI
 
-    const result = await generateAssessment('invalid', mockOpenAI)
+    const result = await generateAssessment(testTags, mockOpenAI)
     expect(result).toEqual([])
   })
 
@@ -73,7 +91,7 @@ describe('generateAssessment', () => {
       },
     } as unknown as OpenAI
 
-    const result = await generateAssessment('empty', mockOpenAI)
+    const result = await generateAssessment(testTags, mockOpenAI)
     expect(result).toEqual([])
   })
 })
