@@ -3,7 +3,7 @@ import { generateAssessment } from '@/lib/generateAssessment'
 import { requireAuth } from '@/lib/requreAuth'
 
 export async function POST(req: NextRequest) {
-  await requireAuth()
+const { id: userId } = await requireAuth()
 
   const { text } = await req.json()
   if (!text || typeof text !== 'string') {
