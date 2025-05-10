@@ -10,52 +10,99 @@ datasource db {
 }
 
 model Submission {
-  id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id        String     @db.Uuid
-  assessment_id  String     @db.Uuid
-  user_answers   Json
-  started_at     DateTime?  @db.Timestamptz(6)
-  completed_at   DateTime?  @db.Timestamptz(6)
-  created_at     DateTime?  @default(now()) @db.Timestamptz(6)
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String    @db.Uuid
+  assessment_id String    @db.Uuid
+  user_answers  Json
+  started_at    DateTime? @db.Timestamptz(6)
+  completed_at  DateTime? @db.Timestamptz(6)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
 
-  assessment     Assessment @relation(fields: [assessment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user           User       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  assessment Assessment           @relation(fields: [assessment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user       User                 @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tag_scores SubmissionTagScore[]
 
   @@map("submissions")
 }
 
 model Assessment {
-  id                          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title                       String        @db.VarChar
-  description                 String?       @db.VarChar
+  id                          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title                       String   @db.VarChar
+  description                 String?  @db.VarChar
   questions                   Json
-  time_limit_minutes          Int?          @db.SmallInt
-  shuffle_questions           Boolean       @default(false)
-  number_of_questions_to_show Int?          @db.SmallInt
-  created_by                  String        @db.Uuid
-  created_at                  DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at                  DateTime      @default(now()) @db.Timestamptz(6)
+  time_limit_minutes          Int?     @db.SmallInt
+  shuffle_questions           Boolean  @default(false)
+  number_of_questions_to_show Int?     @db.SmallInt
+  created_by                  String   @db.Uuid
+  created_at                  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime @default(now()) @db.Timestamptz(6)
 
-  submissions                 Submission[]
-  user                        User          @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  submissions Submission[]
+  user        User            @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tags        AssessmentTag[]
 
   @@map("assessments")
 }
 
 model User {
-  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email           String        @unique
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email           String    @unique
   hashed_password String?
-  provider        String        @default("credentials")
+  provider        String    @default("credentials")
   provider_id     String?
   name            String?
   image           String?
-  role            String?       @default("user")
-  created_at      DateTime?     @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime?     @default(now()) @db.Timestamptz(6)
+  role            String?   @default("user")
+  created_at      DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime? @default(now()) @db.Timestamptz(6)
 
-  submissions     Submission[]
-  assessments     Assessment[]
+  submissions Submission[]
+  assessments Assessment[]
+  tags        Tag[]
 
   @@map("users")
+}
+
+model Tag {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @db.VarChar(50)
+  description String?  @db.VarChar(255)
+  is_preset   Boolean  @default(false)
+  created_by  String?  @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  user        User?                @relation(fields: [created_by], references: [id], onDelete: SetNull)
+  assessments AssessmentTag[]
+  tag_scores  SubmissionTagScore[]
+
+  @@unique([name, created_by])
+  @@map("tags")
+}
+
+model AssessmentTag {
+  assessment_id String @db.Uuid
+  tag_id        String @db.Uuid
+
+  assessment Assessment @relation(fields: [assessment_id], references: [id], onDelete: Cascade)
+  tag        Tag        @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([assessment_id, tag_id])
+  @@map("assessment_tags")
+}
+
+model SubmissionTagScore {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  submission_id String   @db.Uuid
+  tag_id        String   @db.Uuid
+  total         Int // 関与した設問数
+  correct       Int // 正解数
+  rate          Float // 正答率 (0.0〜1.0)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  submission Submission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  tag        Tag        @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@unique([submission_id, tag_id])
+  @@map("submission_tag_scores")
 }
