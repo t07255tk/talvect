@@ -1,9 +1,7 @@
 import { requireAuth } from '@/lib/requreAuth'
-import GenerateAssessmentForm from './GenerateAssessmentForm'
 
 export default async function Page() {
   await requireAuth()
-
   return (
     <div className='flex flex-col items-center w-full gap-10 px-4 py-12'>
       <div className='text-center'>
@@ -18,9 +16,6 @@ export default async function Page() {
           No setup, no forms — just describe what you want to ask. You can
           refine the assessment anytime.
         </p>
-      </div>
-      <div className='lg:w-1/2 md:w-2/3 w-full'>
-        <GenerateAssessmentForm />
       </div>
     </div>
   )
