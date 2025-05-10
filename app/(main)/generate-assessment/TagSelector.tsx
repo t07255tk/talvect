@@ -33,11 +33,29 @@ export default function TagSelector({
     selectedTags.includes(tag.id),
   )
 
+  const handleGenerate = async () => {
+    fetch('/api/generate-assessment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tags: selectedTags }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.error('Failed to generate assessment')
+        }
+        return res.json()
+      })
+      .then((data) => {
+        console.log('Generated Assessment:', data.assessment)
+      })
+  }
+
   return (
     <div className='space-y-4'>
       <div className='text-lg font-medium'>Select 3 to 6 tags</div>
 
-      {/* Selected badge display */}
       <div className='flex flex-wrap gap-2'>
         {selectedTagObjects.map((tag) => (
           <div
@@ -55,7 +73,6 @@ export default function TagSelector({
         ))}
       </div>
 
-      {/* Search input */}
       <input
         type='text'
         placeholder='Search tags...'
@@ -64,7 +81,6 @@ export default function TagSelector({
         className='w-full px-3 py-2 border rounded-md shadow-sm'
       />
 
-      {/* Tag list */}
       <div className='max-h-60 overflow-y-auto border rounded-lg p-2 bg-background space-y-1'>
         {filteredTags.map((tag) => {
           const isSelected = selectedTags.includes(tag.id)
@@ -107,10 +123,7 @@ export default function TagSelector({
         <p className='text-sm text-muted-foreground'>
           {selectedTags.length} / 6 selected
         </p>
-        <Button
-          disabled={selectedTags.length < 3}
-          onClick={() => console.log('Generate with:', selectedTags)}
-        >
+        <Button disabled={selectedTags.length < 3} onClick={handleGenerate}>
           Generate Assessment
         </Button>
       </div>
