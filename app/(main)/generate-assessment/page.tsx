@@ -1,6 +1,6 @@
 import { requireAuth } from '@/lib/requreAuth'
 import getAvailableTags from '@/lib/tags'
-import GenerateAssessmentForm from './TagSelector'
+import TagSelector from './TagSelector'
 
 export default async function Page() {
   const { id: userId } = await requireAuth()
@@ -14,7 +14,7 @@ export default async function Page() {
         </p>
       </div>
       <div className='lg:w-1/2 md:w-2/3 w-full'>
-        <GenerateAssessmentForm initialTags={tags} />
+        <TagSelector initialTags={tags} />
       </div>
     </div>
   )

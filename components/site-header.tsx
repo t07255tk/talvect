@@ -1,20 +1,21 @@
-'use client'
+import { UserDto } from '@/types/user'
 import { ModeToggle } from './ModeToggle'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { useSession } from 'next-auth/react'
+import { SidebarTrigger } from './ui/sidebar'
 
-export default function Header() {
-  const { data: session } = useSession()
-  const userImage = session?.user?.image ?? ''
+export default function Header({ user }: { user: UserDto }) {
   return (
-    <header className='flex p-2 border-b'>
+    <header className='flex p-2 border-b w-full sticky top-0 bg-background'>
       <nav className='w-full flex items-center justify-between'>
-        <span className='font-bold'>Evalent8</span>
+        <div className='flex items-center gap-2'>
+          <SidebarTrigger className='cursor-pointer' />
+          <span className='show md:hidden text-lg font-bold'>Evalent8</span>
+        </div>
         <div className='flex gap-2'>
           <ModeToggle />
           <Avatar>
-            <AvatarImage src={userImage} />
-            <AvatarFallback />
+            <AvatarImage src={user.image ?? ''} />
+            <AvatarFallback />\
           </Avatar>
         </div>
       </nav>
