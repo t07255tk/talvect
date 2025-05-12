@@ -106,3 +106,68 @@ describe('generateQuestions', () => {
     expect(result).toEqual([])
   })
 })
+
+describe('generateAssessment', () => {
+  it('should call generateQuestions with correct parameters', async () => {
+    const mockOpenAI = {
+      chat: {
+        completions: {
+          create: vi.fn().mockResolvedValue({
+            choices: [
+              {
+                message: {
+                  content: JSON.stringify([
+                    {
+                      type: 'multiple-choice',
+                      question: 'What is 2+2?',
+                      choices: ['3', '4', '5', '6'],
+                      answer: '4',
+                      explanation: 'Simple math',
+                      tags: ['1'],
+                    },
+                  ]),
+                },
+              },
+            ],
+          }),
+        },
+      },
+    } as unknown as OpenAI
+
+    vi.spyOn(assessmentModule, 'generateQuestions').mockImplementation(
+      async (tags, openaiInstance) => {
+        console.log('✅ mock called with:', tags, openaiInstance)
+        expect(tags).toEqual(testTags)
+        expect(openaiInstance).toBe(mockOpenAI)
+        return [
+          {
+            type: 'multiple-choice',
+            question: 'What is 2+2?',
+            choices: ['3', '4', '5', '6'],
+            answer: '4',
+            explanation: 'Basic math',
+            tags: ['1'],
+          },
+        ]
+      },
+    )
+    const mockTx = {
+      assessment: {
+        create: vi.fn().mockResolvedValue({ id: 'test-assessment-id' }),
+      },
+      assessmentTag: {
+        createMany: vi.fn().mockResolvedValue({ count: 2 }),
+      },
+    } as unknown as Prisma.TransactionClient
+    vi.spyOn(prisma, '$transaction').mockImplementation(async (callback) => {
+      return await callback(mockTx as unknown as Prisma.TransactionClient)
+    })
+
+    const result = await assessmentModule.generateAssessment(
+      testTags,
+      'user-abc',
+      mockOpenAI,
+    )
+    expect(result).toBe('test-assessment-id')
+  })
+})

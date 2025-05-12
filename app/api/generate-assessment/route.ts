@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const assessment = await generateAssessment(selectedTags)
+  const assessment = await generateAssessment(selectedTags, userId)
 
   return NextResponse.json({ assessment })
 }
