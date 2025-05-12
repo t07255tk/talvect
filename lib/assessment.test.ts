@@ -1,6 +1,8 @@
+import { Prisma } from '@prisma/client'
 import OpenAI from 'openai'
 import { describe, it, expect, vi } from 'vitest'
-import { generateAssessment } from './assessment'
+import prisma from '@/prisma/client'
+import * as assessmentModule from './assessment'
 
 const testTags = [
   {
@@ -19,36 +21,39 @@ const testTags = [
     description: 'A programming language for enterprise applications',
   },
 ]
-describe('generateAssessment', () => {
-  it('should return valid AssessmentItems when GPT responds correctly', async () => {
-    const mockCreate = vi.fn().mockResolvedValue({
-      choices: [
-        {
-          message: {
-            content: JSON.stringify([
-              {
-                type: 'multiple-choice',
-                question: 'What is 2+2?',
-                choices: ['3', '4', '5', '6'],
-                answer: '4',
-                explanation: 'Basic math',
-                tags: ['1', '2'],
-              },
-            ]),
+
+const mockCreate = vi.fn().mockResolvedValue({
+  choices: [
+    {
+      message: {
+        content: JSON.stringify([
+          {
+            type: 'multiple-choice',
+            question: 'What is 2+2?',
+            choices: ['3', '4', '5', '6'],
+            answer: '4',
+            explanation: 'Basic math',
+            tags: ['1', '2'],
           },
-        },
-      ],
-    })
-
-    const mockOpenAI = {
-      chat: {
-        completions: {
-          create: mockCreate,
-        },
+        ]),
       },
-    } as unknown as OpenAI
+    },
+  ],
+})
 
-    const result = await generateAssessment(testTags, mockOpenAI)
+const mockOpenAI = {
+  chat: {
+    completions: {
+      create: mockCreate,
+    },
+  },
+} as unknown as OpenAI
+describe('generateQuestions', () => {
+  it('should return valid AssessmentItems when GPT responds correctly', async () => {
+    const result = await assessmentModule.generateQuestions(
+      testTags,
+      mockOpenAI,
+    )
     expect(result).toHaveLength(1)
     expect(result[0].question).toBe('What is 2+2?')
   })
@@ -70,7 +75,10 @@ describe('generateAssessment', () => {
       },
     } as unknown as OpenAI
 
-    const result = await generateAssessment(testTags, mockOpenAI)
+    const result = await assessmentModule.generateQuestions(
+      testTags,
+      mockOpenAI,
+    )
     expect(result).toEqual([])
   })
 
@@ -91,7 +99,10 @@ describe('generateAssessment', () => {
       },
     } as unknown as OpenAI
 
-    const result = await generateAssessment(testTags, mockOpenAI)
+    const result = await assessmentModule.generateQuestions(
+      testTags,
+      mockOpenAI,
+    )
     expect(result).toEqual([])
   })
 })

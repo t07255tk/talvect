@@ -1,6 +1,6 @@
 import { TagDto } from '@/types/tag'
 
-export const generateAssessmentPrompt = (tags: TagDto[]) => {
+export const generateQuestionsPrompt = (tags: TagDto[]) => {
   const tagDescriptions = tags
     .map((tag) => `- ${tag.id}: ${tag.name} — ${tag.description}`)
     .join('\n')
