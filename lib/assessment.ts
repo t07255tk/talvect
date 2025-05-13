@@ -4,6 +4,7 @@ import {
   AssessmentItemArraySchema,
 } from '@/lib/validation/assessmentSchema'
 import prisma from '@/prisma/client'
+import { AssessmentDto } from '@/types/assessment'
 import { TagDto } from '@/types/tag'
 import { generateQuestionsPrompt } from './assessmentPrompt'
 
@@ -96,4 +97,24 @@ export async function generateAssessment(
     console.error('Failed to generate and save assessment:', e)
     return null
   }
+}
+
+export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
+  const assessments = await prisma.assessment.findMany({
+    where: { created_by: userId },
+    orderBy: { created_at: 'desc' },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      questions: true,
+    },
+  })
+
+  return assessments.map((assessment) => ({
+    id: assessment.id,
+    title: assessment.title,
+    description: assessment.description || undefined,
+    questions: assessment.questions as AssessmentItem[],
+  }))
 }
