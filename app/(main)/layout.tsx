@@ -13,7 +13,7 @@ export default async function MainLayout({
     <SidebarProvider>
       <AppSidebar user={user} />
       <div className='w-full'>
-        <Header user={user} />
+        <Header />
         {/* The main content area */}
         <main className='flex-1 flex items-center justify-center p-4'>
           {children}
