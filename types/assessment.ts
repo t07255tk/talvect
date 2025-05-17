@@ -1,4 +1,5 @@
 import { AssessmentItem } from '@/lib/validation/assessmentSchema'
+import { TagDto } from './tag'
 
 export type {
   Assessment,
@@ -10,4 +11,6 @@ export type AssessmentDto = {
   title: string
   description?: string
   questions: AssessmentItem[]
+  createdAt: string
+  tags: TagDto[]
 }
