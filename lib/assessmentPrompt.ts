@@ -15,12 +15,23 @@ ${tagDescriptions}
 Based on the traits above, generate **exactly 3** multiple-choice assessment questions suitable for upper-intermediate to advanced learners.
 
 Each question must:
-- Be clearly related to **2 traits** from the list above. If only 1 trait is clearly and uniquely applicable, use just 1.
-- Address subtle distinctions, real-world edge cases, or common misconceptions
-- Require applied understanding—not simple recall
-- Be clearly phrased yet intellectually demanding
-- Provide **4 plausible answer choices**, with only **1 correct**
-- Include a concise explanation that clearly states why the correct answer is right and why the others are incorrect or misleading
+
+- Be clearly connected to **1–2 traits** from the list above. If only one trait is clearly relevant, use only that one. Make the connection between the trait(s) and the question content explicit and purposeful.
+
+- Focus on **real-world ambiguity, trade-offs, or dilemmas** where reasonable people might choose different paths. Avoid straightforward or factual scenarios.
+
+- Test **applied understanding**, not surface-level recall. The question should simulate a real decision or judgment a thoughtful person might face.
+
+- Be intentionally designed to create **divergence in reasoning**. Different personality types or thinking styles (e.g., risk-averse, pragmatic, idealistic, collaborative) should be drawn toward different answers.
+
+- Among the four answer options, ensure that **at least two seem reasonable at first glance**, but only one is technically best when judged by the intended perspective (e.g., data-driven, ethical, strategic, long-term focused).
+
+- All incorrect options must reflect **plausible real-world reasoning**—not obvious mistakes. They should represent common but limited or short-sighted logic.
+
+- In the explanation, explicitly clarify:
+  - Why the correct answer is best, given the intended reasoning style
+  - What makes each other option appealing, and why it falls short
+
 
 For each question, include a \`tags\` field — an array of **exactly 2 \`id\` values**, unless only 1 is clearly appropriate. Choose tags that represent both the core and supporting traits the question relates to.
 
@@ -38,6 +49,10 @@ Format the output strictly as a JSON array of 3 objects like:
   },
   ...
 ]
+
+Before returning, internally review your output once. If any question has overly idealized correct answers or weak distractors, regenerate just that question before responding.
+
+
 
 Return only raw JSON. Do not include triple backticks, markdown, or language labels.
 `

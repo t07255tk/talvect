@@ -23,15 +23,19 @@ export async function generateQuestions(
   try {
     const res = await openai.chat.completions.create({
       model: 'gpt-4o',
+      temperature: 0.9,
+      max_tokens: 2048,
       messages: [
         {
           role: 'system',
           content:
-            'You are a strict exam generator. Always create difficult, logic-based multiple-choice questions with plausible distractors and only one correct answer.',
+            'You are a strict and self-correcting exam generator. You create nuanced, realistic multiple-choice questions that challenge judgment, not recall. You always internally review your own output to eliminate idealized answers or weak distractors before returning the final result.',
         },
-        { role: 'user', content: prompt },
+        {
+          role: 'user',
+          content: prompt,
+        },
       ],
-      temperature: 0.5,
     })
 
     const jsonText = res.choices[0].message.content?.trim()
@@ -103,12 +107,20 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
   const assessments = await prisma.assessment.findMany({
     where: { created_by: userId },
     orderBy: { created_at: 'desc' },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      questions: true,
+    include: {
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
     },
+    // select: {
+    //   id: true,
+    //   title: true,
+    //   description: true,
+    //   questions: true,
+    //   created_at: true,
+    // },
   })
 
   return assessments.map((assessment) => ({
@@ -116,5 +128,37 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
     title: assessment.title,
     description: assessment.description || undefined,
     questions: assessment.questions as AssessmentItem[],
+    createdAt: assessment.created_at.toISOString(),
+    tags: [], // Tags are not included in the query, but can be fetched separately if needed
   }))
+}
+
+export async function getAssessmentById(
+  id: string,
+): Promise<AssessmentDto | null> {
+  const assessment = await prisma.assessment.findUnique({
+    where: { id },
+    include: {
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
+    },
+  })
+
+  if (!assessment) return null
+
+  return {
+    id: assessment.id,
+    title: assessment.title,
+    description: assessment.description || undefined,
+    questions: assessment.questions as AssessmentItem[],
+    createdAt: assessment.created_at.toISOString(),
+    tags: assessment.tags.map((at) => ({
+      id: at.tag.id,
+      name: at.tag.name,
+      description: at.tag.description,
+    })),
+  }
 }
