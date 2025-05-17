@@ -29,7 +29,7 @@ export async function generateQuestions(
         {
           role: 'system',
           content:
-            'You are a strict and self-correcting exam generator. You create nuanced, realistic multiple-choice questions that challenge judgment, not recall. You always internally review your own output to eliminate idealized answers or weak distractors before returning the final result.',
+            'You are a strict and self-correcting exam generator. You create nuanced, realistic multiple-choice-single questions that challenge judgment, not recall. You always internally review your own output to eliminate idealized answers or weak distractors before returning the final result.',
         },
         {
           role: 'user',
@@ -114,13 +114,6 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
         },
       },
     },
-    // select: {
-    //   id: true,
-    //   title: true,
-    //   description: true,
-    //   questions: true,
-    //   created_at: true,
-    // },
   })
 
   return assessments.map((assessment) => ({
@@ -129,7 +122,7 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
     description: assessment.description || undefined,
     questions: assessment.questions as AssessmentItem[],
     createdAt: assessment.created_at.toISOString(),
-    tags: [], // Tags are not included in the query, but can be fetched separately if needed
+    tags: assessment.tags as unknown as TagDto[], // Tags are not included in the query, but can be fetched separately if needed
   }))
 }
 

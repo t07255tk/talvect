@@ -28,10 +28,15 @@ const mockCreate = vi.fn().mockResolvedValue({
       message: {
         content: JSON.stringify([
           {
-            type: 'multiple-choice',
+            type: 'multiple-choice-single',
             question: 'What is 2+2?',
-            choices: ['3', '4', '5', '6'],
-            answer: '4',
+            choices: [
+              { id: 'a', label: '3' },
+              { id: 'b', label: '4' },
+              { id: 'c', label: '5' },
+              { id: 'd', label: '6' },
+            ],
+            answers: ['4'],
             explanation: 'Basic math',
             tags: ['1', '2'],
           },
@@ -118,10 +123,15 @@ describe('generateAssessment', () => {
                 message: {
                   content: JSON.stringify([
                     {
-                      type: 'multiple-choice',
+                      type: 'multiple-choice-single',
                       question: 'What is 2+2?',
-                      choices: ['3', '4', '5', '6'],
-                      answer: '4',
+                      choices: [
+                        { id: 'a', label: '3' },
+                        { id: 'b', label: '4' },
+                        { id: 'c', label: '5' },
+                        { id: 'd', label: '6' },
+                      ],
+                      answers: ['4'],
                       explanation: 'Simple math',
                       tags: ['1'],
                     },
@@ -141,10 +151,15 @@ describe('generateAssessment', () => {
         expect(openaiInstance).toBe(mockOpenAI)
         return [
           {
-            type: 'multiple-choice',
+            type: 'multiple-choice-single',
             question: 'What is 2+2?',
-            choices: ['3', '4', '5', '6'],
-            answer: '4',
+            choices: [
+              { id: 'a', label: '3' },
+              { id: 'b', label: '4' },
+              { id: 'c', label: '5' },
+              { id: 'd', label: '6' },
+            ],
+            answers: ['4'],
             explanation: 'Basic math',
             tags: ['1'],
           },

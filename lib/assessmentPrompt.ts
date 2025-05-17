@@ -12,7 +12,7 @@ The following is a list of traits or skills the user wants to assess:
 
 ${tagDescriptions}
 
-Based on the traits above, generate **exactly 3** multiple-choice assessment questions suitable for upper-intermediate to advanced learners.
+Based on the traits above, generate **exactly 3** multiple-choice-single assessment questions suitable for upper-intermediate to advanced learners.
 
 Each question must:
 
@@ -40,10 +40,15 @@ Use the same language as the input traits (e.g., Japanese tags → Japanese outp
 Format the output strictly as a JSON array of 3 objects like:
 [
   {
-    "type": "multiple-choice",
+    "type": "multiple-choice-single",
     "question": "...",
-    "choices": ["fizz", "buzz", "fizzbuzz", "fififi"],
-    "answer": "fizzbuzz",
+    "choices": [
+      { "id": "a", "label": "..." },
+      { "id": "b", "label": "..." },
+      { "id": "c", "label": "..." },
+      { "id": "d", "label": "..." }
+    ],
+    "answers": ["b"],
     "explanation": "...",
     "tags": ["uuid-1", "uuid-2"]
   },

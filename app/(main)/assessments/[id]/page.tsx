@@ -38,18 +38,23 @@ export default async function AssessmentDetailPage({
               Q{i + 1}. {q.question}
             </h2>
 
-            {q.type === 'multiple-choice' && Array.isArray(q.choices) && (
-              <>
-                <ul className='mt-2 list-disc list-inside text-sm text-muted-foreground'>
-                  {q.choices.map((opt, j) => (
-                    <li key={j}>{opt}</li>
-                  ))}
-                </ul>
-                <p className='mt-2 text-sm'>
-                  ✅ <strong>Answer:</strong> {q.answer}
-                </p>
-              </>
-            )}
+            {q.type === 'multiple-choice-single' &&
+              Array.isArray(q.choices) && (
+                <>
+                  <ul className='mt-2 list-disc list-inside text-sm text-muted-foreground'>
+                    {q.choices.map((opt, j) => (
+                      <li key={j}>{opt.label}</li>
+                    ))}
+                  </ul>
+                  <p className='mt-2 text-sm'>
+                    ✅ <strong>Answer:</strong>
+                    {q.choices
+                      .filter((opt) => q.answers.includes(opt.id))
+                      .map((opt) => opt.label)
+                      .join(', ')}
+                  </p>
+                </>
+              )}
 
             {q.type === 'essay' && (
               <p className='mt-2 text-sm italic text-muted-foreground'>
