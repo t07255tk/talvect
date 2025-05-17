@@ -13,6 +13,7 @@ export const EssayItemSchema = z.object({
   type: z.literal('essay'),
   question: z.string(),
   answer: z.string(),
+  explanation: z.string().optional(),
 })
 
 export const AssessmentItemSchema = z.union([
