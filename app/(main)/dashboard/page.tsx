@@ -8,6 +8,7 @@ export default async function Page() {
   const assessments = await getAssessments(user.id)
 
   return (
+    // TODO: implement this page at final
     <div className='flex flex-col items-center w-full px-4 py-12'>
       <div className='lg:text-6xl md:text-4xl text-2xl font-bold'>
         Evaluate talent. Instantly.
