@@ -47,11 +47,14 @@ export default async function AssessmentDetailPage({
                     ))}
                   </ul>
                   <p className='mt-2 text-sm'>
-                    ✅ <strong>Answer:</strong>
-                    {q.choices
-                      .filter((opt) => q.answers.includes(opt.id))
-                      .map((opt) => opt.label)
-                      .join(', ')}
+                    ✅{' '}
+                    <strong>
+                      Answer:
+                      {q.choices
+                        .filter((opt) => q.answers.includes(opt.id))
+                        .map((opt) => opt.label)
+                        .join(', ')}
+                    </strong>
                   </p>
                 </>
               )}
