@@ -28,10 +28,13 @@ Each question must:
 
 - All incorrect options must reflect **plausible real-world reasoning**—not obvious mistakes. They should represent common but limited or short-sighted logic.
 
-- In the explanation, explicitly clarify:
+**- Ensure that all traits (tags) provided are used at least once across the 3 questions. Distribute the tags as evenly as possible.**
+
+**- Assign exactly 2 tags per question wherever feasible, unless only one is clearly relevant.**
+
+In the explanation, explicitly clarify:
   - Why the correct answer is best, given the intended reasoning style
   - What makes each other option appealing, and why it falls short
-
 
 For each question, include a \`tags\` field — an array of **exactly 2 \`id\` values**, unless only 1 is clearly appropriate. Choose tags that represent both the core and supporting traits the question relates to.
 
@@ -56,8 +59,6 @@ Format the output strictly as a JSON array of 3 objects like:
 ]
 
 Before returning, internally review your output once. If any question has overly idealized correct answers or weak distractors, regenerate just that question before responding.
-
-
 
 Return only raw JSON. Do not include triple backticks, markdown, or language labels.
 `
