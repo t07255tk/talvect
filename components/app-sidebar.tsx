@@ -23,6 +23,7 @@ import { UserDto } from '@/types/user'
 
 const items = [
   { title: 'Dashboard', url: '/dashboard', icon: Dot },
+  { title: 'Assessments', url: '/assessments', icon: Dot },
   { title: 'Generate', url: '/generate-assessment', icon: Dot },
   { title: 'Tags', url: '/tags', icon: Dot },
   { title: 'Results', url: '/results', icon: Dot },
