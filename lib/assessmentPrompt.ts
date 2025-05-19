@@ -28,13 +28,19 @@ Each question must:
 
 - All incorrect options must reflect **plausible real-world reasoning**—not obvious mistakes. They should represent common but limited or short-sighted logic.
 
-**- Ensure that all traits (tags) provided are used at least once across the 3 questions. Distribute the tags as evenly as possible.**
+- Distribute tags based on the total number provided:
 
-**- Assign exactly 2 tags per question wherever feasible, unless only one is clearly relevant.**
+  - If there are **3 tags**, use each tag exactly once. Assign 1 tag to each question.
+  - If there are **4 tags**, use all tags at least once. Assign 2 tags to two questions and 1 tag to one question.
+  - If there are **5 tags**, use all tags at least once. Assign 2 tags to each question, with one tag used twice.
+  - If there are **6 tags**, assign exactly 2 tags to each question and ensure all tags are used once.
+
+This ensures all traits are covered and well-balanced across the questions.
 
 In the explanation, explicitly clarify:
   - Why the correct answer is best, given the intended reasoning style
   - What makes each other option appealing, and why it falls short
+  - Refer to traits using their **names only** (e.g., "Communication", not ID or UUID)
 
 For each question, include a \`tags\` field — an array of **exactly 2 \`id\` values**, unless only 1 is clearly appropriate. Choose tags that represent both the core and supporting traits the question relates to.
 
