@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TagDto } from '@/types/tag'
+import { redirect } from 'next/navigation'
 
 export default function TagSelector({
   initialTags,
@@ -50,7 +51,7 @@ export default function TagSelector({
         return res.json()
       })
       .then((data) => {
-        console.log('Generated Assessment:', data.assessment)
+        redirect(`/assessments/${data.assessmentId}`)
       })
   }
 
