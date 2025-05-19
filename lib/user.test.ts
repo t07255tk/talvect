@@ -1,11 +1,11 @@
 import { User as PrismaUser } from '@prisma/client'
 import { User as NextAuthUser } from 'next-auth'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import prisma from '@/prisma/client'
+import { prisma } from '@/prisma/client'
 import { createUserIfNotExists, getUserByEmail } from './user'
 
 vi.mock('@/prisma/client', () => ({
-  default: {
+  prisma: {
     user: {
       findUnique: vi.fn(),
       create: vi.fn(),

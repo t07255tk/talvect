@@ -3,7 +3,7 @@ import {
   AssessmentItem,
   AssessmentItemArraySchema,
 } from '@/lib/validation/assessmentSchema'
-import prisma from '@/prisma/client'
+import { prisma } from '@/prisma/client'
 import { AssessmentDto } from '@/types/assessment'
 import { TagDto } from '@/types/tag'
 import { generateQuestionsPrompt } from './assessmentPrompt'

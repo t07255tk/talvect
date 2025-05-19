@@ -1,4 +1,4 @@
-import prisma from '@/prisma/client'
+import { prisma } from '@/prisma/client'
 import { TagDto } from '@/types/tag'
 
 export default async function getAvailableTags(

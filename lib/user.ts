@@ -1,6 +1,6 @@
 import { User } from '@prisma/client'
 import { User as NextAuthUser } from 'next-auth'
-import prisma from '@/prisma/client'
+import { prisma } from '@/prisma/client'
 
 export const createUserIfNotExists = async (user: NextAuthUser) => {
   // ユーザーが存在しない場合は作成

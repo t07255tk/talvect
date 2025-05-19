@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import OpenAI from 'openai'
 import { describe, it, expect, vi } from 'vitest'
-import prisma from '@/prisma/client'
+import { prisma } from '@/prisma/client'
 import * as assessmentModule from './assessment'
 
 const testTags = [
