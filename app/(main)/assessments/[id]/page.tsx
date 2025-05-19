@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getAssessmentById } from '@/lib/assessment'
 import { isValidUUID } from '@/lib/validation'
+import { Badge } from '@/components/ui/badge'
 
 export default async function AssessmentDetailPage({
   params,
@@ -25,9 +26,13 @@ export default async function AssessmentDetailPage({
       <p className='text-sm text-muted-foreground'>
         Created: {new Date(assessment.createdAt).toLocaleString()}
       </p>
-      <p className='text-sm'>
-        Tags: {assessment.tags.map((t) => t.name).join(', ')}
-      </p>
+      <div className='flex flex-wrap items-center gap-2 mt-2'>
+        {assessment.tags.map((t) => (
+          <Badge key={t.id} variant='secondary'>
+            {t.name}
+          </Badge>
+        ))}
+      </div>
       <div className='space-y-6 mt-6'>
         {questions.map((q, i) => (
           <div
@@ -38,21 +43,42 @@ export default async function AssessmentDetailPage({
               Q{i + 1}. {q.question}
             </h2>
 
+            {Array.isArray(q.tags) && q.tags.length > 0 && (
+              <div className='flex flex-wrap items-center gap-2 mt-2'>
+                {q.tags.map((tagId) => {
+                  const tag = assessment.tags.find((t) => t.id === tagId)
+                  return tag ? (
+                    <Badge key={tag.id} variant='outline'>
+                      {tag.name}
+                    </Badge>
+                  ) : null
+                })}
+              </div>
+            )}
+
             {q.type === 'multiple-choice-single' &&
               Array.isArray(q.choices) && (
                 <>
-                  <ul className='mt-2 list-disc list-inside text-sm text-muted-foreground'>
-                    {q.choices.map((opt, j) => (
-                      <li key={j}>{opt.label}</li>
-                    ))}
+                  <ul className='mt-2 list-none text-sm text-muted-foreground space-y-1'>
+                    {q.choices.map((opt) => {
+                      return (
+                        <li key={opt.id}>
+                          <span className='font-semibold'>
+                            {opt.id.toUpperCase()}.{' '}
+                          </span>
+                          {opt.label}
+                        </li>
+                      )
+                    })}
                   </ul>
+
                   <p className='mt-2 text-sm'>
                     ✅{' '}
                     <strong>
-                      Answer:
+                      Answer:{' '}
                       {q.choices
                         .filter((opt) => q.answers.includes(opt.id))
-                        .map((opt) => opt.label)
+                        .map((opt) => opt.id.toUpperCase())
                         .join(', ')}
                     </strong>
                   </p>
