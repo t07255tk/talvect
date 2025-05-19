@@ -14,6 +14,7 @@ export default function TagSelector({
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [hoveredTag, setHoveredTag] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
+  const [generating, setGenerating] = useState(false)
 
   const toggleTag = (id: string) => {
     setSelectedTags((prev) =>
@@ -34,6 +35,7 @@ export default function TagSelector({
   )
 
   const handleGenerate = async () => {
+    setGenerating(true)
     fetch('/api/generate-assessment', {
       method: 'POST',
       headers: {
@@ -123,7 +125,11 @@ export default function TagSelector({
         <p className='text-sm text-muted-foreground'>
           {selectedTags.length} / 6 selected
         </p>
-        <Button disabled={selectedTags.length < 3} onClick={handleGenerate}>
+        <Button
+          disabled={selectedTags.length < 3 || generating}
+          onClick={handleGenerate}
+          className='cursor-pointer'
+        >
           Generate Assessment
         </Button>
       </div>
