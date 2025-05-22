@@ -23,16 +23,22 @@ export default async function AssessmentDetailPage({
       <h1 className='text-2xl font-bold'>Assessment Detail</h1>
       <h2 className='text-xl font-semibold'>{assessment.title}</h2>
 
-      <p className='text-sm text-muted-foreground'>
-        Created: {new Date(assessment.createdAt).toLocaleString()}
-      </p>
-      <div className='flex flex-wrap items-center gap-2 mt-2'>
+      <div className='flex flex-wrap items-center gap-2 mt-1'>
         {assessment.tags.map((t) => (
           <Badge key={t.id} variant='secondary'>
             {t.name}
           </Badge>
         ))}
       </div>
+
+      <p className='text-sm text-muted-foreground mt-2'>
+        {assessment.description?.trim() || 'No description'}
+      </p>
+
+      <p className='text-xs text-muted-foreground'>
+        Created: {new Date(assessment.createdAt).toLocaleString()}
+      </p>
+
       <div className='space-y-6 mt-6'>
         {questions.map((q, i) => (
           <div
