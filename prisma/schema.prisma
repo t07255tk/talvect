@@ -44,6 +44,18 @@ model Assessment {
   @@map("assessments")
 }
 
+model Company {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @db.VarChar(100)
+  description String?  @db.VarChar(255)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  users UserCompany[]
+
+  @@map("companies")
+}
+
 model User {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email           String    @unique
@@ -52,15 +64,33 @@ model User {
   provider_id     String?
   name            String?
   image           String?
-  role            String?   @default("user")
   created_at      DateTime? @default(now()) @db.Timestamptz(6)
   updated_at      DateTime? @default(now()) @db.Timestamptz(6)
 
   submissions Submission[]
   assessments Assessment[]
   tags        Tag[]
+  companies   UserCompany[]
 
   @@map("users")
+}
+
+enum Role {
+  admin
+  member
+  applicant
+}
+
+model UserCompany {
+  user_id    String @db.Uuid
+  company_id String @db.Uuid
+  role       Role   @default(member)
+
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, company_id])
+  @@map("user_companies")
 }
 
 model Tag {
