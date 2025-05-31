@@ -2,7 +2,7 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   compiler: {
-    removeConsole: true,
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   /* config options here */
 }
