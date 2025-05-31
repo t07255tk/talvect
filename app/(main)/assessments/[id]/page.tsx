@@ -3,6 +3,14 @@ import { getAssessmentById } from '@/lib/assessment'
 import { isValidUUID } from '@/lib/validation'
 import { Badge } from '@/components/ui/badge'
 
+function getBadgeClass(weight: number) {
+  if (weight >= 0.75) return 'bg-red-500 text-white'
+  if (weight >= 0.5) return 'bg-orange-400 text-black'
+  if (weight >= 0.25) return 'bg-yellow-300 text-black'
+  if (weight > 0) return 'bg-gray-300 text-gray-800'
+  return 'bg-muted text-muted-foreground'
+}
+
 export default async function AssessmentDetailPage({
   params,
 }: {
@@ -49,57 +57,56 @@ export default async function AssessmentDetailPage({
               Q{i + 1}. {q.question}
             </h2>
 
-            {Array.isArray(q.tags) && q.tags.length > 0 && (
-              <div className='flex flex-wrap items-center gap-2 mt-2'>
-                {q.tags.map((tagId) => {
-                  const tag = assessment.tags.find((t) => t.id === tagId)
-                  return tag ? (
-                    <Badge key={tag.id} variant='outline'>
-                      {tag.name}
-                    </Badge>
-                  ) : null
-                })}
-              </div>
-            )}
-
             {q.type === 'multiple-choice-single' &&
               Array.isArray(q.choices) && (
                 <>
                   <ul className='mt-2 list-none text-sm text-muted-foreground space-y-1'>
                     {q.choices.map((opt) => {
+                      const relatedTagEntries =
+                        opt.tagWeights && typeof opt.tagWeights === 'object'
+                          ? (Object.entries(opt.tagWeights)
+                              .map(([tagId, weight]) => {
+                                const tag = assessment.tags.find(
+                                  (t) => t.id === tagId,
+                                )
+                                return tag ? { name: tag.name, weight } : null
+                              })
+                              .filter(Boolean) as {
+                              name: string
+                              weight: number
+                            }[])
+                          : []
+
                       return (
                         <li key={opt.id}>
-                          <span className='font-semibold'>
-                            {opt.id.toUpperCase()}.{' '}
-                          </span>
-                          {opt.label}
+                          <div className='font-semibold'>
+                            {opt.id.toUpperCase()}. {opt.label}
+                          </div>
+                          {relatedTagEntries.length > 0 && (
+                            <div className='flex flex-wrap gap-1 mt-1 ml-6'>
+                              {relatedTagEntries.map(({ name, weight }) => (
+                                <Badge
+                                  key={name}
+                                  className={`text-[10px] ${getBadgeClass(
+                                    weight,
+                                  )}`}
+                                  title={`Weight: ${weight.toFixed(2)}`}
+                                >
+                                  {name}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
                         </li>
                       )
                     })}
                   </ul>
-
-                  <p className='mt-2 text-sm'>
-                    ✅{' '}
-                    <strong>
-                      Answer:{' '}
-                      {q.choices
-                        .filter((opt) => q.answers.includes(opt.id))
-                        .map((opt) => opt.id.toUpperCase())
-                        .join(', ')}
-                    </strong>
-                  </p>
                 </>
               )}
 
             {q.type === 'essay' && (
               <p className='mt-2 text-sm italic text-muted-foreground'>
                 📝 Essay response expected.
-              </p>
-            )}
-
-            {q.explanation && (
-              <p className='text-xs text-muted-foreground mt-2'>
-                💡 {q.explanation}
               </p>
             )}
           </div>
