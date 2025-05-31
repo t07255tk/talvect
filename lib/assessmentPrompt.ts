@@ -6,66 +6,65 @@ export const generateQuestionsPrompt = (tags: TagDto[]) => {
     .join('\n')
 
   return `
-You are an advanced AI specialized in generating challenging and nuanced assessment questions to evaluate specific human qualities or competencies.
+You are an advanced AI specialized in generating assessment questions to evaluate specific human tendencies, styles, and competencies through nuanced decision-making.
 
-The following is a list of traits or skills the user wants to assess:
+The following is a list of evaluation tags (traits or skills):
 
 ${tagDescriptions}
 
-Based on the traits above, generate **exactly 3** multiple-choice-single assessment questions suitable for upper-intermediate to advanced learners.
+Your task is to generate exactly 3 multiple-choice-single questions designed to reveal reasoning patterns and judgment tendencies.
 
 Each question must:
 
-- Be clearly connected to **1–2 traits** from the list above. If only one trait is clearly relevant, use only that one. Make the connection between the trait(s) and the question content explicit and purposeful.
+- Be clearly aligned with 1 or 2 tags from the list above. Select tags that reflect both the core and supporting traits.
+- Focus on real-world ambiguity, trade-offs, or dilemmas where reasonable people may choose differently.
+- Test applied understanding, not factual knowledge.
+- Be designed to create divergent reasoning—different thinking styles (e.g., risk-averse, ethical, strategic) should gravitate toward different choices.
 
-- Focus on **real-world ambiguity, trade-offs, or dilemmas** where reasonable people might choose different paths. Avoid straightforward or factual scenarios.
+Answer choices:
 
-- Test **applied understanding**, not surface-level recall. The question should simulate a real decision or judgment a thoughtful person might face.
+- Each question must provide 4 options labeled with uppercase letters: "A", "B", "C", "D".
+- Each option should be plausible and grounded in real-world logic. No obvious throwaway answers.
+- Each option must be assigned a \`tagWeights\` field, a dictionary mapping tag IDs to numeric values between 0.0 and 1.0, representing how much the option expresses that trait.
+- It is not required to assign weights to all tags; only include tags relevant to the option.
+- Tag weights do not need to sum to 1.0. They represent absolute strength of each trait independently.
 
-- Be intentionally designed to create **divergence in reasoning**. Different personality types or thinking styles (e.g., risk-averse, pragmatic, idealistic, collaborative) should be drawn toward different answers.
+Tag distribution logic:
 
-- Among the four answer options, ensure that **at least two seem reasonable at first glance**, but only one is technically best when judged by the intended perspective (e.g., data-driven, ethical, strategic, long-term focused).
+- If 3 tags: use each tag once (1 per question).
+- If 4 tags: use all tags; assign 2 tags to two questions, 1 tag to one.
+- If 5 tags: use all tags; assign 2 tags per question with one tag reused.
+- If 6 tags: assign 2 tags to each question, use all tags once.
 
-- All incorrect options must reflect **plausible real-world reasoning**—not obvious mistakes. They should represent common but limited or short-sighted logic.
+Output a JSON array of exactly 3 question objects in the following format:
 
-- Distribute tags based on the total number provided:
-
-  - If there are **3 tags**, use each tag exactly once. Assign 1 tag to each question.
-  - If there are **4 tags**, use all tags at least once. Assign 2 tags to two questions and 1 tag to one question.
-  - If there are **5 tags**, use all tags at least once. Assign 2 tags to each question, with one tag used twice.
-  - If there are **6 tags**, assign exactly 2 tags to each question and ensure all tags are used once.
-
-This ensures all traits are covered and well-balanced across the questions.
-
-In the explanation, explicitly clarify:
-  - Why the correct answer is best, given the intended reasoning style
-  - What makes each other option appealing, and why it falls short
-  - Refer to traits using their **names only** (e.g., "Communication", not ID or UUID)
-
-For each question, include a \`tags\` field — an array of **exactly 2 \`id\` values**, unless only 1 is clearly appropriate. Choose tags that represent both the core and supporting traits the question relates to.
-
-Use the same language as the input traits (e.g., Japanese tags → Japanese output).
-
-Format the output strictly as a JSON array of 3 objects like:
 [
   {
     "type": "multiple-choice-single",
     "question": "...",
     "choices": [
-      { "id": "a", "label": "..." },
-      { "id": "b", "label": "..." },
-      { "id": "c", "label": "..." },
-      { "id": "d", "label": "..." }
-    ],
-    "answers": ["b"],
-    "explanation": "...",
-    "tags": ["uuid-1", "uuid-2"]
+      {
+        "id": "A",
+        "label": "...",
+        "tagWeights": {
+          "uuid-1": 0.6,
+          "uuid-2": 0.4
+        }
+      },
+      ...
+    ]
   },
   ...
 ]
 
-Before returning, internally review your output once. If any question has overly idealized correct answers or weak distractors, regenerate just that question before responding.
+Do not include answers or explanations.
 
-Return only raw JSON. Do not include triple backticks, markdown, or language labels.
+This is not a right-or-wrong test. It assesses decision tendencies.
+
+Before responding, verify:
+
+- All questions clearly align with the tag goals.
+- tagWeights are realistic and meaningful.
+- Output raw JSON only, no markdown, backticks, or comments.
 `
 }
