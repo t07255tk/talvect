@@ -7,7 +7,7 @@ export default function Header() {
       <nav className='w-full flex items-center justify-between'>
         <div className='flex items-center gap-2'>
           <SidebarTrigger className='cursor-pointer' />
-          <span className='show md:hidden text-lg font-bold'>Evalent8</span>
+          <span className='show md:hidden text-lg font-bold'>Talvect</span>
         </div>
         <div className='flex gap-2'>
           <ModeToggle />

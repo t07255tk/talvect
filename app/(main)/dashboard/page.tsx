@@ -14,8 +14,8 @@ export default async function Page() {
         Evaluate talent. Instantly.
       </div>
       <p className='text-muted-foreground text-sm mt-2'>
-        Select **3 to 6 tags** that describe your ideal candidate — Evalent8
-        will automatically generate an AI-powered screening test.
+        Select **3 to 6 tags** that describe your ideal candidate — Talvect will
+        automatically generate an AI-powered screening test.
       </p>
       <p className='text-sm text-muted-foreground mt-1'>
         No forms, no prompt writing — just choose the qualities you value. You

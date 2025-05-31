@@ -34,7 +34,7 @@ export function AppSidebar({ user }: { user: UserDto }) {
   const pathname = usePathname()
 
   return (
-    <Sidebar collapsible='icon'>
+    <Sidebar>
       <SidebarHeader>
         <div
           className={cn(
@@ -42,17 +42,20 @@ export function AppSidebar({ user }: { user: UserDto }) {
             state === 'collapsed' ? 'md:justify-center' : '',
           )}
         >
-          <SidebarTrigger className='cursor-pointer show md:hidden' />
+          <SidebarTrigger
+            className={cn(
+              'cursor-pointer',
+              isMobile || state === 'expanded' ? 'hidden' : 'show',
+            )}
+          />
           <div className='flex items-center'>
             <span
               className={cn(
                 'text-lg font-bold transition-opacity duration-200',
-                isMobile || state === 'expanded' ? 'show' : 'hidden',
               )}
             >
-              Evalent
+              Talvect
             </span>
-            <span className='text-lg font-bold'>8</span>
           </div>
         </div>
       </SidebarHeader>

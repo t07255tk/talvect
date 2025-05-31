@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Evalent8 – AI-Powered Hiring Assessments',
+  title: 'Talvect – Intelligent Talent Assessment',
   description:
-    'Generate hiring-grade quizzes from any prompt or URL, complete with instant feedback. Discover and evaluate talent in seconds.',
+    'Create tailored screening assessments instantly with AI. Evaluate decision tendencies, behavioral traits, and role fit — all in seconds.',
 }
 
 export default function RootLayout({
