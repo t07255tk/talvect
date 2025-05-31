@@ -122,7 +122,11 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
     description: assessment.description || undefined,
     questions: assessment.questions as AssessmentItem[],
     createdAt: assessment.created_at.toISOString(),
-    tags: assessment.tags as unknown as TagDto[], // Tags are not included in the query, but can be fetched separately if needed
+    tags: assessment.tags.map((at) => ({
+      id: at.tag.id,
+      name: at.tag.name,
+      description: at.tag.description,
+    })),
   }))
 }
 
