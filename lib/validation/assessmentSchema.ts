@@ -1,27 +1,21 @@
 import { z } from 'zod'
+export const TagWeightSchema = z.record(z.string(), z.number().min(0).max(1))
 
 export const ChoiceSchema = z.object({
-  id: z.string(), // 'a', 'b', ...
+  id: z.string(),
   label: z.string(),
-  weight: z.number().optional(),
-  tags: z.array(z.string()).optional(),
+  tagWeights: TagWeightSchema.optional(),
 })
 
 export const MultipleChoiceItemSchema = z.object({
   type: z.literal('multiple-choice-single'),
   question: z.string(),
   choices: z.array(ChoiceSchema).length(4),
-  answers: z.array(z.string()).min(1), // ['b'] or ['a', 'c'] など
-  explanation: z.string().optional(),
-  tags: z.array(z.string()).min(1).max(3),
 })
 
 export const EssayItemSchema = z.object({
   type: z.literal('essay'),
   question: z.string(),
-  answers: z.array(z.string()).min(1), // 模範解答（複数可）
-  explanation: z.string().optional(),
-  tags: z.array(z.string()).min(1).max(3),
 })
 
 export const AssessmentItemSchema = z.union([
