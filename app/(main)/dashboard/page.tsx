@@ -3,12 +3,14 @@ import { Button } from '@/components/ui/button'
 import { getAssessments } from '@/lib/assessment'
 import { requireAuth } from '@/lib/requreAuth'
 import { getCompanyForUser } from '@/lib/company'
+import { createCompanyAndAssignUser } from '@/lib/user'
 
 export default async function Page() {
   const user = await requireAuth()
   const assessments = await getAssessments(user.id)
   const company = await getCompanyForUser(user.id)
   if (!company) {
+    await createCompanyAndAssignUser(user)
   }
 
   return (
