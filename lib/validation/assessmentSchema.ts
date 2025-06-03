@@ -8,12 +8,14 @@ export const ChoiceSchema = z.object({
 })
 
 export const MultipleChoiceItemSchema = z.object({
+  id: z.string().optional(), // Optional ID for questions, can be generated later
   type: z.literal('multiple-choice-single'),
   question: z.string(),
   choices: z.array(ChoiceSchema).length(4),
 })
 
 export const EssayItemSchema = z.object({
+  id: z.string().optional(), // Optional ID for questions, can be generated later
   type: z.literal('essay'),
   question: z.string(),
 })
@@ -33,5 +35,6 @@ export const AssessmentSchema = z.object({
 export const AssessmentArraySchema = z.array(AssessmentSchema)
 export const AssessmentItemArraySchema = z.array(AssessmentItemSchema)
 
+export type Choice = z.infer<typeof ChoiceSchema>
 export type AssessmentItem = z.infer<typeof AssessmentItemSchema>
 export type Assessment = z.infer<typeof AssessmentSchema>

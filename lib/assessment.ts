@@ -146,11 +146,15 @@ export async function getAssessmentById(
 
   if (!assessment) return null
 
+  const questions = assessment.questions as AssessmentItem[]
   return {
     id: assessment.id,
     title: assessment.title,
     description: assessment.description || undefined,
-    questions: assessment.questions as AssessmentItem[],
+    questions: questions.map((q, i) => ({
+      ...q,
+      id: q.id || `${i + 1}`, // Ensure each question has a unique ID
+    })),
     createdAt: assessment.created_at.toISOString(),
     tags: assessment.tags.map((at) => ({
       id: at.tag.id,
