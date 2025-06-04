@@ -1,14 +1,13 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
 import { notFound, useRouter } from 'next/navigation'
+import { use, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { getAssessmentById } from '@/lib/assessment'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { isValidUUID } from '@/lib/validation'
-import { AssessmentDto } from '@/types/assessment'
 import { Choice } from '@/lib/validation/assessmentSchema'
+import { AssessmentDto } from '@/types/assessment'
 
 export default function AssessmentStartPage({
   params,
@@ -40,13 +39,22 @@ export default function AssessmentStartPage({
     setAnswers((prev) => ({ ...prev, [question.id ?? '']: choiceId }))
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < total - 1) {
       setCurrentIndex((i) => i + 1)
-    } else {
-      console.log('Submit:', answers)
-      router.push(`/assessments/${assessment.id}/result`)
+      return
     }
+
+    await fetch(`/api/assessments/${assessment.id}/submit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ answers }),
+    })
+    alert('Assessment submitted successfully')
+    console.log('Submit:', answers)
+    // router.push(`/assessments/${assessment.id}/result`)
   }
 
   return (
@@ -56,7 +64,6 @@ export default function AssessmentStartPage({
       </h1>
       {question.type === 'multiple-choice-single' && (
         <>
-          {JSON.stringify(answers)}
           <p className='mb-4 text-lg'>{question.question}</p>
           <RadioGroup
             className='space-y-3'
