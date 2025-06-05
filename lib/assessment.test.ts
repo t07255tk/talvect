@@ -28,13 +28,18 @@ const mockCreate = vi.fn().mockResolvedValue({
       message: {
         content: JSON.stringify([
           {
-            type: 'multiple-choice-single',
+            type: 'MULTIPLE_CHOICE_SINGLE',
             question: 'What is 2+2?',
             choices: [
-              { id: 'A', label: '3' },
-              { id: 'B', label: '4' },
-              { id: 'C', label: '5' },
-              { id: 'D', label: '6' },
+              {
+                id: 'a',
+                tagId: 'a',
+                label: '3',
+                tagWeights: { '1': 0.6, '2': 0.4 },
+              },
+              { id: 'b', tagId: 'b', label: '4' },
+              { id: 'c', tagId: 'c', label: '5' },
+              { id: 'd', tagId: 'd', label: '6' },
             ],
             tagWeights: [{ '1': 0.6 }, { '2': 0.4 }],
           },
@@ -121,13 +126,18 @@ describe('generateAssessment', () => {
                 message: {
                   content: JSON.stringify([
                     {
-                      type: 'multiple-choice-single',
+                      type: 'MULTIPLE_CHOICE_SINGLE',
                       question: 'What is 2+2?',
                       choices: [
-                        { id: 'a', label: '3' },
-                        { id: 'b', label: '4' },
-                        { id: 'c', label: '5' },
-                        { id: 'd', label: '6' },
+                        {
+                          id: 'a',
+                          tagId: 'a',
+                          label: '3',
+                          tagWeights: { '1': 0.6, '2': 0.4 },
+                        },
+                        { id: 'b', tagId: 'b', label: '4' },
+                        { id: 'c', tagId: 'c', label: '5' },
+                        { id: 'd', tagId: 'd', label: '6' },
                       ],
                       answers: ['4'],
                       explanation: 'Simple math',
@@ -149,13 +159,18 @@ describe('generateAssessment', () => {
         expect(openaiInstance).toBe(mockOpenAI)
         return [
           {
-            type: 'multiple-choice-single',
+            type: 'MULTIPLE_CHOICE_SINGLE',
             question: 'What is 2+2?',
             choices: [
-              { id: 'a', label: '3' },
-              { id: 'b', label: '4' },
-              { id: 'c', label: '5' },
-              { id: 'd', label: '6' },
+              {
+                id: 'a',
+                tagId: 'a',
+                label: '3',
+                tagWeights: { '1': 0.6, '2': 0.4 },
+              },
+              { id: 'b', tagId: 'b', label: '4' },
+              { id: 'c', tagId: 'c', label: '5' },
+              { id: 'd', tagId: 'd', label: '6' },
             ],
             answers: ['4'],
             explanation: 'Basic math',

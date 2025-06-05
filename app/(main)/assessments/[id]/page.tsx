@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
+import { Badge } from '@/components/ui/badge'
 import { getAssessmentById } from '@/lib/assessment'
 import { isValidUUID } from '@/lib/validation'
-import { Badge } from '@/components/ui/badge'
 
 function getBadgeClass(weight: number) {
   if (weight >= 0.75) return 'bg-red-500 text-white'
@@ -57,7 +57,7 @@ export default async function AssessmentDetailPage({
               Q{i + 1}. {q.question}
             </h2>
 
-            {q.type === 'multiple-choice-single' &&
+            {q.type === 'MULTIPLE_CHOICE_SINGLE' &&
               Array.isArray(q.choices) && (
                 <>
                   <ul className='mt-2 list-none text-sm text-muted-foreground space-y-1'>
@@ -80,7 +80,7 @@ export default async function AssessmentDetailPage({
                       return (
                         <li key={opt.id}>
                           <div className='font-semibold'>
-                            {opt.id.toUpperCase()}. {opt.label}
+                            {opt.choiceId}. {opt.label}
                           </div>
                           {relatedTagEntries.length > 0 && (
                             <div className='flex flex-wrap gap-1 mt-1 ml-6'>
@@ -104,7 +104,7 @@ export default async function AssessmentDetailPage({
                 </>
               )}
 
-            {q.type === 'essay' && (
+            {q.type === 'ESSAY' && (
               <p className='mt-2 text-sm italic text-muted-foreground'>
                 📝 Essay response expected.
               </p>

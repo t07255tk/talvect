@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import OpenAI from 'openai'
 import {
   AssessmentItem,
@@ -29,7 +30,7 @@ export async function generateQuestions(
         {
           role: 'system',
           content:
-            'You are a strict and self-correcting exam generator. You create nuanced, realistic multiple-choice-single questions that challenge judgment, not recall. You always internally review your own output to eliminate idealized answers or weak distractors before returning the final result.',
+            'You are a strict and self-correcting exam generator. You create nuanced, realistic MULTIPLE_CHOICE_SINGLE questions that challenge judgment, not recall. You always internally review your own output to eliminate idealized answers or weak distractors before returning the final result.',
         },
         {
           role: 'user',
@@ -48,6 +49,7 @@ export async function generateQuestions(
     const parsed = JSON.parse(jsonText)
     const result = AssessmentItemArraySchema.safeParse(parsed)
     if (!result.success) {
+      console.dir(result.error.errors, { depth: null, colors: true })
       console.error('Validation failed:', result.error.format())
       return []
     }
@@ -80,8 +82,30 @@ export async function generateAssessment(
         data: {
           title,
           description,
-          questions,
           created_by: createdBy,
+          questions: {
+            create: questions.map((q) => {
+              if (q.type === 'MULTIPLE_CHOICE_SINGLE') {
+                return {
+                  type: q.type,
+                  question: q.question,
+                  choices: {
+                    create: q.choices.map((c) => ({
+                      choiceId: c.id,
+                      label: c.label,
+                      tagWeights: (c.tagWeights ??
+                        Prisma.JsonNull) as Prisma.InputJsonValue,
+                    })),
+                  },
+                }
+              } else {
+                return {
+                  type: q.type,
+                  question: q.question,
+                }
+              }
+            }),
+          },
         },
       })
 
@@ -108,6 +132,11 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
     where: { created_by: userId },
     orderBy: { created_at: 'desc' },
     include: {
+      questions: {
+        include: {
+          choices: true,
+        },
+      },
       tags: {
         include: {
           tag: true,
@@ -136,6 +165,11 @@ export async function getAssessmentById(
   const assessment = await prisma.assessment.findUnique({
     where: { id },
     include: {
+      questions: {
+        include: {
+          choices: true,
+        },
+      },
       tags: {
         include: {
           tag: true,
@@ -151,10 +185,7 @@ export async function getAssessmentById(
     id: assessment.id,
     title: assessment.title,
     description: assessment.description || undefined,
-    questions: questions.map((q, i) => ({
-      ...q,
-      id: q.id || `${i + 1}`, // Ensure each question has a unique ID
-    })),
+    questions: questions,
     createdAt: assessment.created_at.toISOString(),
     tags: assessment.tags.map((at) => ({
       id: at.tag.id,

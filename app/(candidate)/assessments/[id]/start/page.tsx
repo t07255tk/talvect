@@ -52,9 +52,7 @@ export default function AssessmentStartPage({
       },
       body: JSON.stringify({ answers }),
     })
-    alert('Assessment submitted successfully')
-    console.log('Submit:', answers)
-    // router.push(`/assessments/${assessment.id}/result`)
+    router.push(`/assessments/${assessment.id}/result`)
   }
 
   return (
@@ -62,8 +60,9 @@ export default function AssessmentStartPage({
       <h1 className='text-2xl font-semibold mb-4'>
         Question {Number(currentIndex) + 1} of {Number(total)}
       </h1>
-      {question.type === 'multiple-choice-single' && (
+      {question.type === 'MULTIPLE_CHOICE_SINGLE' && (
         <>
+          {JSON.stringify(answers)}
           <p className='mb-4 text-lg'>{question.question}</p>
           <RadioGroup
             className='space-y-3'

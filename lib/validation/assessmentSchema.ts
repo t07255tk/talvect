@@ -1,22 +1,24 @@
 import { z } from 'zod'
+
 export const TagWeightSchema = z.record(z.string(), z.number().min(0).max(1))
 
 export const ChoiceSchema = z.object({
   id: z.string(),
+  tagId: z.string(),
   label: z.string(),
   tagWeights: TagWeightSchema.optional(),
 })
 
 export const MultipleChoiceItemSchema = z.object({
   id: z.string().optional(), // Optional ID for questions, can be generated later
-  type: z.literal('multiple-choice-single'),
+  type: z.literal('MULTIPLE_CHOICE_SINGLE'),
   question: z.string(),
   choices: z.array(ChoiceSchema).length(4),
 })
 
 export const EssayItemSchema = z.object({
   id: z.string().optional(), // Optional ID for questions, can be generated later
-  type: z.literal('essay'),
+  type: z.literal('ESSAY'),
   question: z.string(),
 })
 

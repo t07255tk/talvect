@@ -54,7 +54,7 @@ Output format:
 - Each item must follow this structure:
 [
   {
-    "type": "multiple-choice-single",
+    "type": "MULTIPLE_CHOICE_SINGLE",
     "question": "...",
     "choices": [
       {

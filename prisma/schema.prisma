@@ -25,11 +25,16 @@ model Submission {
   @@map("submissions")
 }
 
+enum QuestionType {
+  MULTIPLE_CHOICE_SINGLE
+  ESSAY
+}
+
 model Assessment {
   id                          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title                       String   @db.VarChar
   description                 String?  @db.VarChar
-  questions                   Json
+  questions                   AssessmentQuestion[]
   time_limit_minutes          Int?     @db.SmallInt
   shuffle_questions           Boolean  @default(false)
   number_of_questions_to_show Int?     @db.SmallInt
@@ -42,6 +47,36 @@ model Assessment {
   tags        AssessmentTag[]
 
   @@map("assessments")
+}
+
+model AssessmentQuestion {
+  id           String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assessment   Assessment        @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessmentId String            @db.Uuid
+
+  type         QuestionType
+  question     String            @db.Text
+  choices      AssessmentChoice[]
+
+  created_at   DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime          @default(now()) @db.Timestamptz(6)
+
+  @@map("assessment_questions")
+}
+
+model AssessmentChoice {
+  id           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  question     AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId   String             @db.Uuid
+
+  choiceId     String             @db.Char(1)   // e.g., "A", "B", etc.
+  label        String             @db.Text
+  tagWeights   Json              // Record<tagId: string, weight: number>
+
+  created_at   DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime           @default(now()) @db.Timestamptz(6)
+
+  @@map("assessment_choices")
 }
 
 model Company {
