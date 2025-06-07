@@ -3,10 +3,12 @@ import { User as NextAuthUser } from 'next-auth'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { prisma } from '@/prisma/client'
 import {
+  assignUserToCompany,
   createCompanyAndAssignUser,
   createUserIfNotExists,
   getUserByEmail,
 } from './user'
+import * as userModule from './user'
 
 vi.mock('@/prisma/client', () => ({
   prisma: {
@@ -14,7 +16,16 @@ vi.mock('@/prisma/client', () => ({
       findUnique: vi.fn(),
       create: vi.fn(),
     },
-    $transaction: vi.fn(),
+    userCompany: {
+      upsert: vi.fn(),
+    },
+    $transaction: vi.fn((fn) => {
+      fn({
+        userCompany: {
+          upsert: vi.fn(),
+        },
+      })
+    }),
   },
 }))
 
@@ -87,6 +98,78 @@ describe('getUserByEmail', () => {
   })
 })
 
+const mockCompanyId = 'company-456'
+const mockUserId = 'user123'
+const mockRole = Role.admin
+const userCompanyPayload = {
+  user_id: mockUserId,
+  company_id: mockCompanyId,
+  role: mockRole,
+}
+describe('assignUserToCompany', () => {
+  const mockUpsert = vi.fn()
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should upsert user company role using default prisma (no tx)', async () => {
+    prisma.userCompany.upsert = mockUpsert
+    mockUpsert.mockResolvedValue(userCompanyPayload)
+
+    const result = await assignUserToCompany(
+      mockUserId,
+      mockCompanyId,
+      mockRole,
+    )
+
+    expect(mockUpsert).toHaveBeenCalledWith({
+      where: {
+        user_id_company_id: {
+          user_id: mockUserId,
+          company_id: mockCompanyId,
+        },
+      },
+      update: { role: mockRole },
+      create: {
+        user_id: mockUserId,
+        company_id: mockCompanyId,
+        role: mockRole,
+      },
+    })
+
+    expect(result).toEqual(userCompanyPayload) // upsert returns the created/updated record, but we don't care about it in this test
+  })
+
+  it('should upsert user company role using passed tx', async () => {
+    const result = await assignUserToCompany(
+      mockUserId,
+      mockCompanyId,
+      mockRole,
+      {
+        userCompany: { upsert: mockUpsert },
+      } as unknown as Prisma.TransactionClient,
+    )
+
+    expect(mockUpsert).toHaveBeenCalledWith({
+      where: {
+        user_id_company_id: {
+          user_id: mockUserId,
+          company_id: mockCompanyId,
+        },
+      },
+      update: { role: mockRole },
+      create: {
+        user_id: mockUserId,
+        company_id: mockCompanyId,
+        role: mockRole,
+      },
+    })
+
+    expect(result).toEqual(userCompanyPayload)
+  })
+})
+
 describe('createCompanyAndAssignUser', () => {
   const mockCreate = vi.fn()
   const mockUpsert = vi.fn()
@@ -100,6 +183,10 @@ describe('createCompanyAndAssignUser', () => {
         userCompany: { upsert: mockUpsert },
       } as unknown as Prisma.TransactionClient)
     })
+
+    vi.spyOn(userModule, 'assignUserToCompany').mockResolvedValue(
+      userCompanyPayload,
+    )
   })
 
   it('should create a company and assign the user as admin', async () => {
@@ -107,7 +194,6 @@ describe('createCompanyAndAssignUser', () => {
       id: 'company-456',
       name: "Test User's Company",
     })
-    mockUpsert.mockResolvedValue({})
 
     const result = await createCompanyAndAssignUser(mockPrismaUser)
 
@@ -120,20 +206,12 @@ describe('createCompanyAndAssignUser', () => {
       },
     })
 
-    expect(mockUpsert).toHaveBeenCalledWith({
-      where: {
-        user_id_company_id: {
-          user_id: 'user123',
-          company_id: 'company-456',
-        },
-      },
-      update: { role: Role.admin },
-      create: {
-        user_id: 'user123',
-        company_id: 'company-456',
-        role: Role.admin,
-      },
-    })
+    expect(userModule.assignUserToCompany).toHaveBeenCalledWith(
+      mockUserId,
+      mockCompanyId,
+      Role.admin,
+      expect.anything(),
+    )
 
     expect(result).toEqual({ id: 'company-456', name: "Test User's Company" })
   })

@@ -1,7 +1,8 @@
-import { Role, User } from '@prisma/client'
+import { Prisma, Role, User } from '@prisma/client'
 import { User as NextAuthUser } from 'next-auth'
 import { prisma } from '@/prisma/client'
 import { UserDto } from '@/types/user'
+import * as userModule from './user'
 
 export const createUserIfNotExists = async (user: NextAuthUser) => {
   // ユーザーが存在しない場合は作成
@@ -26,6 +27,29 @@ export const getUserByEmail = async (email: string) => {
   return user
 }
 
+export const assignUserToCompany = async (
+  userId: string,
+  companyId: string,
+  role: Role,
+  tx?: Prisma.TransactionClient,
+) => {
+  const transaction = tx || prisma
+  return await transaction.userCompany.upsert({
+    where: {
+      user_id_company_id: {
+        user_id: userId,
+        company_id: companyId,
+      },
+    },
+    update: { role: role },
+    create: {
+      user_id: userId,
+      company_id: companyId,
+      role,
+    },
+  })
+}
+
 export const createCompanyAndAssignUser = async (user: UserDto) => {
   return await prisma.$transaction(async (tx) => {
     const company = await tx.company.create({
@@ -39,20 +63,7 @@ export const createCompanyAndAssignUser = async (user: UserDto) => {
       },
     })
 
-    await tx.userCompany.upsert({
-      where: {
-        user_id_company_id: {
-          user_id: user.id,
-          company_id: company.id,
-        },
-      },
-      update: { role: Role.admin },
-      create: {
-        user_id: user.id,
-        company_id: company.id,
-        role: Role.admin,
-      },
-    })
+    await userModule.assignUserToCompany(user.id, company.id, Role.admin, tx)
 
     return company
   })
