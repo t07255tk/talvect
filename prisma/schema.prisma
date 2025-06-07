@@ -39,11 +39,14 @@ model Assessment {
   shuffle_questions           Boolean  @default(false)
   number_of_questions_to_show Int?     @db.SmallInt
   created_by                  String   @db.Uuid
+  company_id                  String  @db.Uuid
   created_at                  DateTime @default(now()) @db.Timestamptz(6)
   updated_at                  DateTime @default(now()) @db.Timestamptz(6)
 
   submissions Submission[]
   user        User            @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  company     Company         @relation(fields: [company_id], references: [id])
+
   tags        AssessmentTag[]
 
   @@map("assessments")
@@ -86,7 +89,8 @@ model Company {
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   updated_at  DateTime @default(now()) @db.Timestamptz(6)
 
-  users UserCompany[]
+  users       UserCompany[]
+  assessments Assessment[]
 
   @@map("companies")
 }
