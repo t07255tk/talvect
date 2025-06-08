@@ -1,9 +1,9 @@
-import NextAuth from 'next-auth'
+import NextAuth, { AuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-import { User } from 'next-auth'
-import { createUserIfNotExists } from '@/lib/user'
+import { createCompanyAndAssignUser, createUserIfNotExists } from '@/lib/user'
+import { toUserDto } from '@/types/user'
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -12,12 +12,28 @@ export const authOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async signIn({ user }: { user: User }) {
-      await createUserIfNotExists(user)
+    async signIn({ user }) {
+      const dbUser = await createUserIfNotExists(user)
+      if (!dbUser.companies || dbUser.companies.length === 0) {
+        await createCompanyAndAssignUser(toUserDto(dbUser))
+      }
       return true
     },
-
-    async redirect({ baseUrl }: { baseUrl: string }) {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.companyId = user.companies?.[0]?.id
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string
+        session.user.companyId = token.companyId as string | undefined
+      }
+      return session
+    },
+    async redirect({ baseUrl }) {
       return `${baseUrl}/dashboard`
     },
   },

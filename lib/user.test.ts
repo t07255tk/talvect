@@ -1,4 +1,4 @@
-import { Prisma, User as PrismaUser, Role } from '@prisma/client'
+import { Prisma, User as PrismaUser, Role, UserCompany } from '@prisma/client'
 import { User as NextAuthUser } from 'next-auth'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { prisma } from '@/prisma/client'
@@ -29,7 +29,13 @@ vi.mock('@/prisma/client', () => ({
   },
 }))
 
-const mockPrismaUser: PrismaUser = {
+const mockPrisumaUserCompany: UserCompany = {
+  user_id: 'user123',
+  company_id: 'company456',
+  role: Role.admin,
+}
+
+const mockPrismaUser: PrismaUser & { companies: UserCompany[] } = {
   id: 'user123',
   email: 'test@example.com',
   name: 'Test User',
@@ -39,6 +45,7 @@ const mockPrismaUser: PrismaUser = {
   provider_id: null,
   created_at: null,
   updated_at: null,
+  companies: [mockPrisumaUserCompany],
 }
 
 describe('createUserIfNotExists', () => {
@@ -54,26 +61,26 @@ describe('createUserIfNotExists', () => {
   })
 
   it('returns existing user if already exists', async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(mockPrismaUser)
+    vi.spyOn(userModule, 'getUserByEmail').mockResolvedValue(mockPrismaUser)
 
     const result = await createUserIfNotExists(inputUser)
 
-    expect(prisma.user.findUnique).toHaveBeenCalledWith({
-      where: { email: inputUser.email! },
-    })
+    expect(userModule.getUserByEmail).toHaveBeenCalledWith(inputUser.email!)
     expect(prisma.user.create).not.toHaveBeenCalled()
     expect(result).toEqual(mockPrismaUser)
   })
 
   it('creates and returns new user if not exists', async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null)
-    vi.mocked(prisma.user.create).mockResolvedValueOnce(mockPrismaUser)
+    const spy = vi
+      .spyOn(userModule, 'getUserByEmail')
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(mockPrismaUser)
+
+    vi.spyOn(prisma.user, 'create').mockResolvedValueOnce(mockPrismaUser)
 
     const result = await createUserIfNotExists(inputUser)
 
-    expect(prisma.user.findUnique).toHaveBeenCalledWith({
-      where: { email: inputUser.email! },
-    })
+    expect(spy).toHaveBeenCalledWith(inputUser.email!)
     expect(prisma.user.create).toHaveBeenCalledWith({
       data: {
         email: inputUser.email!,
@@ -86,13 +93,20 @@ describe('createUserIfNotExists', () => {
 })
 
 describe('getUserByEmail', () => {
-  it('getUserByEmail returns user if found', async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(mockPrismaUser)
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
 
-    const result = await getUserByEmail('test@example.com')
+  it('returns user if found', async () => {
+    const spy = vi
+      .spyOn(prisma.user, 'findUnique')
+      .mockResolvedValueOnce(mockPrismaUser)
 
-    expect(prisma.user.findUnique).toHaveBeenCalledWith({
-      where: { email: 'test@example.com' },
+    const result = await getUserByEmail(mockPrismaUser.email)
+
+    expect(spy).toHaveBeenCalledWith({
+      where: { email: mockPrismaUser.email },
+      include: { companies: true },
     })
     expect(result).toEqual(mockPrismaUser)
   })
