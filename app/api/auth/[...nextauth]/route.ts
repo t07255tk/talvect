@@ -17,12 +17,14 @@ export const authOptions: AuthOptions = {
       if (!dbUser.companies || dbUser.companies.length === 0) {
         await createCompanyAndAssignUser(toUserDto(dbUser))
       }
+      user.id = dbUser.id
+      user.companyId = dbUser.companies?.[0]?.company_id
       return true
     },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.companyId = user.companies?.[0]?.id
+        token.companyId = user.companyId
       }
       return token
     },
