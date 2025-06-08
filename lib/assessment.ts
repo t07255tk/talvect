@@ -7,6 +7,7 @@ import {
 import { prisma } from '@/prisma/client'
 import { AssessmentDto } from '@/types/assessment'
 import { TagDto } from '@/types/tag'
+import { UserDto } from '@/types/user'
 import { generateQuestionsPrompt } from './assessmentPrompt'
 
 export async function generateQuestions(
@@ -40,13 +41,18 @@ export async function generateQuestions(
     })
 
     const jsonText = res.choices[0].message.content?.trim()
+    const cleaned = jsonText
+      ?.replace(/^```json/, '')
+      .replace(/^```/, '')
+      .replace(/```$/, '')
+      .trim()
 
-    if (!jsonText) {
-      console.error('GPT returned empty content')
+    if (!cleaned) {
+      console.error('Empty or malformed JSON from OpenAI')
       return []
     }
 
-    const parsed = JSON.parse(jsonText)
+    const parsed = JSON.parse(cleaned)
     const result = AssessmentItemArraySchema.safeParse(parsed)
     if (!result.success) {
       console.dir(result.error.errors, { depth: null, colors: true })
@@ -62,7 +68,7 @@ export async function generateQuestions(
 
 export async function generateAssessment(
   tags: TagDto[],
-  createdBy: string,
+  createdUser: UserDto,
   openaiInstance?: OpenAI,
 ): Promise<string | null> {
   try {
@@ -82,7 +88,8 @@ export async function generateAssessment(
         data: {
           title,
           description,
-          created_by: createdBy,
+          created_by: createdUser.id,
+          company_id: createdUser.companyId!,
           questions: {
             create: questions.map((q) => {
               if (q.type === 'MULTIPLE_CHOICE_SINGLE') {
