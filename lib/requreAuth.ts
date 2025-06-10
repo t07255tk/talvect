@@ -17,10 +17,5 @@ export async function requireAuth(): Promise<UserDto> {
     redirect('/signup') // 👈 適切な初期セットアップページに飛ばす
   }
 
-  // ここで companyId が null/undefined なら onboarding に飛ばす
-  if (!user.companies || user.companies.length === 0) {
-    redirect('/onboarding') // 👈 最初のcompany作成 or 選択
-  }
-
   return toUserDto(user, session.user.companyId)
 }
