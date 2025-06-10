@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { getNowByServer, setServerTime } from '@/lib/utils/time'
 import { isValidUUID } from '@/lib/validation'
-import { Choice } from '@/lib/validation/assessmentSchema'
+import { Answers, Choice } from '@/lib/validation/assessmentSchema'
 import { AssessmentDto } from '@/types/assessment'
 
 export default function AssessmentStartPage({
@@ -22,12 +22,15 @@ export default function AssessmentStartPage({
   const [assessment, setAssessment] = useState<AssessmentDto | null>(null)
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [answers, setAnswers] = useState<Answers>([])
 
   useEffect(() => {
     fetch(`/api/assessments/${id}`)
       .then((res) => res.json())
-      .then(setAssessment)
+      .then((data) => {
+        setAssessment(data.assessment)
+        setServerTime(data.serverTime) // サーバー時刻を初期化
+      })
       .then(() => setLoading(false))
   }, [id])
 
@@ -37,8 +40,23 @@ export default function AssessmentStartPage({
   const total = assessment.questions.length
 
   const handleSelect = (choiceId: string) => {
-    setAnswers((prev) => ({ ...prev, [question.id ?? '']: choiceId }))
+    const questionId = question.id!
+    const answeredAt = getNowByServer()
+
+    setAnswers((prev) => {
+      const existing = prev.find((a) => a.questionId === questionId)
+      const updated = { questionId, choiceId, answeredAt }
+
+      if (existing) {
+        return prev.map((a) => (a.questionId === questionId ? updated : a))
+      } else {
+        return [...prev, updated]
+      }
+    })
   }
+
+  const currentAnswer =
+    answers.find((a) => a.questionId === question.id)?.choiceId || ''
 
   const handleNext = async () => {
     if (currentIndex < total - 1) {
@@ -53,21 +71,25 @@ export default function AssessmentStartPage({
       },
       body: JSON.stringify({ answers }),
     })
-    router.push(`/assessments/${assessment.id}/result`)
+    router.push('/completed')
   }
+
+  const hasAnsweredCurrent = answers.some(
+    (a) => a.questionId === question.id && a.choiceId,
+  )
 
   return (
     <div className='max-w-xl mx-auto p-6'>
       <h1 className='text-2xl font-semibold mb-4'>
-        Question {Number(currentIndex) + 1} of {Number(total)}
+        Question {currentIndex + 1} of {total}
       </h1>
+
       {question.type === 'MULTIPLE_CHOICE_SINGLE' && (
         <>
-          {JSON.stringify(answers)}
           <p className='mb-4 text-lg'>{question.question}</p>
           <RadioGroup
             className='space-y-3'
-            value={answers[question.id ?? ''] || ''}
+            value={currentAnswer}
             onValueChange={handleSelect}
           >
             {question.choices.map((choice: Choice) => (
@@ -83,7 +105,7 @@ export default function AssessmentStartPage({
       <Button
         className='mt-6'
         onClick={handleNext}
-        disabled={!answers[question.id ?? '']}
+        disabled={!hasAnsweredCurrent}
       >
         {currentIndex === total - 1 ? 'Submit' : 'Next'}
       </Button>

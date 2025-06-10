@@ -1,6 +1,5 @@
-// app/api/assessments/[id]/route.ts
-import { getAssessmentById } from '@/lib/assessment'
 import { NextResponse } from 'next/server'
+import { getAssessmentById } from '@/lib/assessment'
 
 export async function GET(
   req: Request,
@@ -11,5 +10,8 @@ export async function GET(
   if (!assessment) {
     return NextResponse.json({ error: 'Assessment not found' }, { status: 404 })
   }
-  return NextResponse.json(assessment)
+  return NextResponse.json({
+    assessment,
+    serverTime: new Date().toISOString(),
+  })
 }

@@ -13,7 +13,7 @@ model Submission {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id       String    @db.Uuid
   assessment_id String    @db.Uuid
-  user_answers  Json
+  user_answers  UserAnswer[]
   started_at    DateTime? @db.Timestamptz(6)
   completed_at  DateTime? @db.Timestamptz(6)
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
@@ -23,6 +23,23 @@ model Submission {
   tag_scores SubmissionTagScore[]
 
   @@map("submissions")
+}
+
+model UserAnswer {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  submission_id  String   @db.Uuid
+  question_id    String
+  choice_id      String
+  confidence     Float?
+  comment        String?
+  answered_at    DateTime
+
+  submission     Submission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+
+  @@index([submission_id])
+  @@index([question_id])
+
+  @@map("user_answers")
 }
 
 enum QuestionType {
