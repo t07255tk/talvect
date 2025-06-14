@@ -39,15 +39,15 @@ export const assignUserToCompany = async (
   const transaction = tx || prisma
   return await transaction.userCompany.upsert({
     where: {
-      user_id_company_id: {
-        user_id: userId,
-        company_id: companyId,
+      userId_companyId: {
+        userId,
+        companyId,
       },
     },
     update: { role: role },
     create: {
-      user_id: userId,
-      company_id: companyId,
+      userId,
+      companyId,
       role,
     },
   })
@@ -60,7 +60,7 @@ export const createCompanyAndAssignUser = async (user: UserDto) => {
         name: `${user.name}'s Company`,
         users: {
           create: {
-            user_id: user.id,
+            userId: user.id,
           },
         },
       },

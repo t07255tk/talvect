@@ -88,8 +88,8 @@ export async function generateAssessment(
         data: {
           title,
           description,
-          created_by: createdUser.id,
-          company_id: createdUser.companyId!,
+          createdBy: createdUser.id,
+          companyId: createdUser.companyId!,
           questions: {
             create: questions.map((q) => {
               if (q.type === 'MULTIPLE_CHOICE_SINGLE') {
@@ -98,7 +98,7 @@ export async function generateAssessment(
                   question: q.question,
                   choices: {
                     create: q.choices.map((c) => ({
-                      choiceId: c.id,
+                      choiceId: c.choiceId,
                       label: c.label,
                       tagWeights: {
                         create: (c.tagWeights
@@ -127,8 +127,8 @@ export async function generateAssessment(
 
       await tx.assessmentTag.createMany({
         data: tags.map((tag) => ({
-          assessment_id: newAssessment.id,
-          tag_id: tag.id,
+          assessmentId: newAssessment.id,
+          tagId: tag.id,
         })),
         skipDuplicates: true,
       })
@@ -145,8 +145,8 @@ export async function generateAssessment(
 
 export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
   const assessments = await prisma.assessment.findMany({
-    where: { created_by: userId },
-    orderBy: { created_at: 'desc' },
+    where: { createdBy: userId },
+    orderBy: { createdAt: 'desc' },
     include: {
       questions: {
         include: {
@@ -176,7 +176,7 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
     questions: assessment.questions.map((q) => {
       return toAssessmentQuestionDto(q)
     }),
-    createdAt: assessment.created_at.toISOString(),
+    createdAt: assessment.createdAt.toISOString(),
     tags: assessment.tags.map((at) => ({
       id: at.tag.id,
       name: at.tag.name,
@@ -222,7 +222,7 @@ export async function getAssessmentById(
     title: assessment.title,
     description: assessment.description || undefined,
     questions: questions,
-    createdAt: assessment.created_at.toISOString(),
+    createdAt: assessment.createdAt.toISOString(),
     tags: assessment.tags.map((at) => ({
       id: at.tag.id,
       name: at.tag.name,

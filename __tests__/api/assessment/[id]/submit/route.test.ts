@@ -13,8 +13,8 @@ vi.mock('@/lib/submission', () => ({
     return Promise.resolve({
       id: 'submission-123',
       completed_at: new Date('2025-06-10T00:00:00Z'),
-      user_id: 'mock-user-id',
-      assessment_id: 'valid-uuid',
+      userId: 'mock-user-id',
+      assessmentId: 'valid-uuid',
       started_at: new Date('2025-06-01T00:00:00Z'),
       created_at: new Date('2025-06-01T00:00:00Z'),
     })
@@ -94,11 +94,11 @@ describe('POST /api/assessment/[id]/submit', () => {
     vi.mocked(requireAuth).mockResolvedValue(mockUser)
     vi.mocked(createSubmissionWithUserAnswers).mockResolvedValue({
       id: 'submission-123',
-      completed_at: new Date('2025-06-10T00:00:00Z'),
-      user_id: '',
-      assessment_id: '',
-      started_at: new Date('2025-06-01T00:00:00Z'),
-      created_at: new Date('2025-06-01T00:00:00Z'),
+      completedAt: new Date('2025-06-10T00:00:00Z'),
+      userId: '',
+      assessmentId: '',
+      startedAt: new Date('2025-06-01T00:00:00Z'),
+      createdAt: new Date('2025-06-01T00:00:00Z'),
     })
 
     const response = await POST(

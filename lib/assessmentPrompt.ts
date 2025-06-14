@@ -58,7 +58,7 @@ Output format:
     "question": "...",
     "choices": [
       {
-        "id": "A",
+        "choiceId": "A",
         "label": "...",
         "tagWeights": {
           "uuid-1": 0.6,

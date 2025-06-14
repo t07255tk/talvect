@@ -1,6 +1,5 @@
-import { prisma } from '@/prisma/client'
-
 import { Company } from '@prisma/client'
+import { prisma } from '@/prisma/client'
 
 export const getCompanyForUser = async (
   userId: string,
@@ -9,7 +8,7 @@ export const getCompanyForUser = async (
     where: {
       users: {
         some: {
-          user_id: userId,
+          userId,
         },
       },
     },

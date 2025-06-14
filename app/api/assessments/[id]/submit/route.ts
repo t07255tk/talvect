@@ -32,6 +32,6 @@ export async function POST(
 
   return NextResponse.json({
     submissionId: submission.id,
-    completedAt: submission.completed_at,
+    completedAt: submission.completedAt,
   })
 }

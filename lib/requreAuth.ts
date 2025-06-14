@@ -16,6 +16,6 @@ export async function requireAuth(): Promise<UserDto> {
     // DBに登録されていない or 作成中のユーザー
     redirect('/signup') // 👈 適切な初期セットアップページに飛ばす
   }
-
+  console.log('requireAuth user:', session.user.companyId)
   return toUserDto(user, session.user.companyId)
 }

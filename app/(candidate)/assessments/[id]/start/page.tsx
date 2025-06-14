@@ -92,10 +92,13 @@ export default function AssessmentStartPage({
             value={currentAnswer}
             onValueChange={handleSelect}
           >
-            {question.choices.map((choice: Choice) => (
-              <div key={choice.id} className='flex items-center space-x-3'>
-                <RadioGroupItem value={choice.id} id={choice.id} />
-                <Label htmlFor={choice.id}>{choice.label}</Label>
+            {question.choices.map((choice) => (
+              <div
+                key={choice.choiceId}
+                className='flex items-center space-x-3'
+              >
+                <RadioGroupItem value={choice.choiceId} id={choice.choiceId} />
+                <Label htmlFor={choice.choiceId}>{choice.label}</Label>
               </div>
             ))}
           </RadioGroup>

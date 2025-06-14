@@ -30,8 +30,8 @@ vi.mock('@/prisma/client', () => ({
 }))
 
 const mockPrisumaUserCompany: UserCompany = {
-  user_id: 'user123',
-  company_id: 'company456',
+  userId: 'user123',
+  companyId: 'company456',
   role: Role.admin,
 }
 
@@ -40,11 +40,11 @@ const mockPrismaUser: PrismaUser & { companies: UserCompany[] } = {
   email: 'test@example.com',
   name: 'Test User',
   image: 'https://example.com/icon.png',
-  hashed_password: null,
+  hashedPassword: null,
   provider: '',
-  provider_id: null,
-  created_at: null,
-  updated_at: null,
+  providerId: null,
+  createdAt: null,
+  updatedAt: null,
   companies: [mockPrisumaUserCompany],
 }
 
@@ -116,8 +116,8 @@ const mockCompanyId = 'company-456'
 const mockUserId = 'user123'
 const mockRole = Role.admin
 const userCompanyPayload = {
-  user_id: mockUserId,
-  company_id: mockCompanyId,
+  userId: mockUserId,
+  companyId: mockCompanyId,
   role: mockRole,
 }
 describe('assignUserToCompany', () => {
@@ -139,15 +139,15 @@ describe('assignUserToCompany', () => {
 
     expect(mockUpsert).toHaveBeenCalledWith({
       where: {
-        user_id_company_id: {
-          user_id: mockUserId,
-          company_id: mockCompanyId,
+        userId_companyId: {
+          userId: mockUserId,
+          companyId: mockCompanyId,
         },
       },
       update: { role: mockRole },
       create: {
-        user_id: mockUserId,
-        company_id: mockCompanyId,
+        userId: mockUserId,
+        companyId: mockCompanyId,
         role: mockRole,
       },
     })
@@ -167,15 +167,15 @@ describe('assignUserToCompany', () => {
 
     expect(mockUpsert).toHaveBeenCalledWith({
       where: {
-        user_id_company_id: {
-          user_id: mockUserId,
-          company_id: mockCompanyId,
+        userId_companyId: {
+          userId: mockUserId,
+          companyId: mockCompanyId,
         },
       },
       update: { role: mockRole },
       create: {
-        user_id: mockUserId,
-        company_id: mockCompanyId,
+        userId: mockUserId,
+        companyId: mockCompanyId,
         role: mockRole,
       },
     })
@@ -215,7 +215,7 @@ describe('createCompanyAndAssignUser', () => {
       data: {
         name: "Test User's Company",
         users: {
-          create: { user_id: 'user123' },
+          create: { userId: 'user123' },
         },
       },
     })
