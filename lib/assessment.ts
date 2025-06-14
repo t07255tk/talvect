@@ -1,11 +1,10 @@
-import { Prisma } from '@prisma/client'
 import OpenAI from 'openai'
 import {
   AssessmentItem,
   AssessmentItemArraySchema,
 } from '@/lib/validation/assessmentSchema'
 import { prisma } from '@/prisma/client'
-import { AssessmentDto } from '@/types/assessment'
+import { AssessmentDto, toAssessmentQuestionDto } from '@/types/assessment'
 import { TagDto } from '@/types/tag'
 import { UserDto } from '@/types/user'
 import { generateQuestionsPrompt } from './assessmentPrompt'
@@ -70,9 +69,10 @@ export async function generateAssessment(
   tags: TagDto[],
   createdUser: UserDto,
   openaiInstance?: OpenAI,
+  generateQuestionsFn: typeof generateQuestions = generateQuestions,
 ): Promise<string | null> {
   try {
-    const questions = await generateQuestions(tags, openaiInstance)
+    const questions = await generateQuestionsFn(tags, openaiInstance)
 
     if (!questions || questions.length === 0) {
       return null
@@ -100,8 +100,17 @@ export async function generateAssessment(
                     create: q.choices.map((c) => ({
                       choiceId: c.id,
                       label: c.label,
-                      tagWeights: (c.tagWeights ??
-                        Prisma.JsonNull) as Prisma.InputJsonValue,
+                      tagWeights: {
+                        create: (c.tagWeights
+                          ? Object.entries(c.tagWeights)
+                          : Object.entries({})
+                        ).map(([tagId, weight]) => ({
+                          tag: {
+                            connect: { id: tagId },
+                          },
+                          weight: Number(weight),
+                        })),
+                      },
                     })),
                   },
                 }
@@ -141,7 +150,15 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
     include: {
       questions: {
         include: {
-          choices: true,
+          choices: {
+            include: {
+              tagWeights: {
+                include: {
+                  tag: true,
+                },
+              },
+            },
+          },
         },
       },
       tags: {
@@ -156,7 +173,9 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
     id: assessment.id,
     title: assessment.title,
     description: assessment.description || undefined,
-    questions: assessment.questions as AssessmentItem[],
+    questions: assessment.questions.map((q) => {
+      return toAssessmentQuestionDto(q)
+    }),
     createdAt: assessment.created_at.toISOString(),
     tags: assessment.tags.map((at) => ({
       id: at.tag.id,
@@ -174,7 +193,15 @@ export async function getAssessmentById(
     include: {
       questions: {
         include: {
-          choices: true,
+          choices: {
+            include: {
+              tagWeights: {
+                include: {
+                  tag: true,
+                },
+              },
+            },
+          },
         },
       },
       tags: {
@@ -187,7 +214,9 @@ export async function getAssessmentById(
 
   if (!assessment) return null
 
-  const questions = assessment.questions as AssessmentItem[]
+  const questions = assessment.questions.map((q) => {
+    return toAssessmentQuestionDto(q)
+  })
   return {
     id: assessment.id,
     title: assessment.title,

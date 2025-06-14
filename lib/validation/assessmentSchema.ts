@@ -4,6 +4,7 @@ export const TagWeightSchema = z.record(z.string(), z.number().min(0).max(1))
 
 export const ChoiceSchema = z.object({
   id: z.string(),
+  choiceId: z.string(),
   label: z.string(),
   tagWeights: TagWeightSchema.optional(),
 })

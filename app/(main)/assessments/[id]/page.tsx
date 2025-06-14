@@ -61,42 +61,27 @@ export default async function AssessmentDetailPage({
               Array.isArray(q.choices) && (
                 <>
                   <ul className='mt-2 list-none text-sm text-muted-foreground space-y-1'>
-                    {q.choices.map((opt) => {
-                      const relatedTagEntries =
-                        opt.tagWeights && typeof opt.tagWeights === 'object'
-                          ? (Object.entries(opt.tagWeights)
-                              .map(([tagId, weight]) => {
-                                const tag = assessment.tags.find(
-                                  (t) => t.id === tagId,
-                                )
-                                return tag ? { name: tag.name, weight } : null
-                              })
-                              .filter(Boolean) as {
-                              name: string
-                              weight: number
-                            }[])
-                          : []
-
+                    {q.choices.map((choice) => {
                       return (
-                        <li key={opt.id}>
+                        <li key={choice.choiceId}>
                           <div className='font-semibold'>
-                            {opt.choiceId}. {opt.label}
+                            {choice.choiceId}. {choice.label}
                           </div>
-                          {relatedTagEntries.length > 0 && (
-                            <div className='flex flex-wrap gap-1 mt-1 ml-6'>
-                              {relatedTagEntries.map(({ name, weight }) => (
-                                <Badge
-                                  key={name}
-                                  className={`text-[10px] ${getBadgeClass(
-                                    weight,
-                                  )}`}
-                                  title={`Weight: ${weight.toFixed(2)}`}
-                                >
-                                  {name}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
+                          {choice.tagWeights &&
+                            Array.isArray(choice.tagWeights) && (
+                              <div className='flex flex-wrap gap-1 mt-1 ml-6'>
+                                {choice.tagWeights.map((tw) => {
+                                  return (
+                                    <Badge
+                                      key={tw.tagId}
+                                      className={getBadgeClass(tw.weight)}
+                                    >
+                                      {tw.name}
+                                    </Badge>
+                                  )
+                                })}
+                              </div>
+                            )}
                         </li>
                       )
                     })}

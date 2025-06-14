@@ -33,15 +33,26 @@ const mockCreate = vi.fn().mockResolvedValue({
             choices: [
               {
                 id: 'a',
-                tagId: 'a',
+                choiceId: 'A',
                 label: '3',
                 tagWeights: { '1': 0.6, '2': 0.4 },
               },
-              { id: 'b', tagId: 'b', label: '4' },
-              { id: 'c', tagId: 'c', label: '5' },
-              { id: 'd', tagId: 'd', label: '6' },
+              {
+                id: 'b',
+                choiceId: 'B',
+                label: '4',
+              },
+              {
+                id: 'c',
+                choiceId: 'C',
+                label: '5',
+              },
+              {
+                id: 'd',
+                choiceId: 'D',
+                label: '6',
+              },
             ],
-            tagWeights: [{ '1': 0.6 }, { '2': 0.4 }],
           },
         ]),
       },
@@ -131,9 +142,21 @@ describe('generateAssessment', () => {
                       choices: [
                         {
                           id: 'a',
-                          tagId: 'a',
                           label: '3',
-                          tagWeights: { '1': 0.6, '2': 0.4 },
+                          tagWeights: [
+                            {
+                              id: '1',
+                              choiceId: 'A',
+                              tagId: 'a',
+                              weight: 0.6,
+                            },
+                            {
+                              id: '2',
+                              choiceId: 'B',
+                              tagId: 'b',
+                              weight: 0.8,
+                            },
+                          ],
                         },
                         { id: 'b', tagId: 'b', label: '4' },
                         { id: 'c', tagId: 'c', label: '5' },
@@ -152,33 +175,23 @@ describe('generateAssessment', () => {
       },
     } as unknown as OpenAI
 
-    vi.spyOn(assessmentModule, 'generateQuestions').mockImplementation(
-      async (tags, openaiInstance) => {
-        console.log('✅ mock called with:', tags, openaiInstance)
-        expect(tags).toEqual(testTags)
-        expect(openaiInstance).toBe(mockOpenAI)
-        return [
+    const mockGenerateQuestions = vi.fn().mockResolvedValue([
+      {
+        type: 'MULTIPLE_CHOICE_SINGLE',
+        question: 'What is 2+2?',
+        choices: [
           {
-            type: 'MULTIPLE_CHOICE_SINGLE',
-            question: 'What is 2+2?',
-            choices: [
-              {
-                id: 'a',
-                tagId: 'a',
-                label: '3',
-                tagWeights: { '1': 0.6, '2': 0.4 },
-              },
-              { id: 'b', tagId: 'b', label: '4' },
-              { id: 'c', tagId: 'c', label: '5' },
-              { id: 'd', tagId: 'd', label: '6' },
-            ],
-            answers: ['4'],
-            explanation: 'Basic math',
-            tags: ['1'],
+            id: 'a',
+            choiceId: 'A',
+            label: '3',
+            tagWeights: { '1': 0.6, '2': 0.4 },
           },
-        ]
+          { id: 'b', choiceId: 'B', label: '4' },
+          { id: 'c', choiceId: 'C', label: '5' },
+          { id: 'd', choiceId: 'D', label: '6' },
+        ],
       },
-    )
+    ])
     const mockTx = {
       assessment: {
         create: vi.fn().mockResolvedValue({ id: 'test-assessment-id' }),
@@ -191,10 +204,18 @@ describe('generateAssessment', () => {
       return await callback(mockTx as unknown as Prisma.TransactionClient)
     })
 
+    const userDto = {
+      id: 'user-abc',
+      companyId: 'company-xyz',
+      name: null,
+      image: null,
+      email: 'test@example.com',
+    }
     const result = await assessmentModule.generateAssessment(
       testTags,
-      'user-abc',
+      userDto,
       mockOpenAI,
+      mockGenerateQuestions,
     )
     expect(result).toBe('test-assessment-id')
   })

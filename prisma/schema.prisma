@@ -91,12 +91,24 @@ model AssessmentChoice {
 
   choiceId     String             @db.Char(1)   // e.g., "A", "B", etc.
   label        String             @db.Text
-  tagWeights   Json              // Record<tagId: string, weight: number>
+  tagWeights   AssessmentChoiceTagWeight[]
 
   created_at   DateTime           @default(now()) @db.Timestamptz(6)
   updated_at   DateTime           @default(now()) @db.Timestamptz(6)
 
   @@map("assessment_choices")
+}
+
+model AssessmentChoiceTagWeight {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  choiceId        String   @db.Uuid
+  tagId           String   @db.Uuid
+  weight          Float
+
+  choice          AssessmentChoice @relation(fields: [choiceId], references: [id], onDelete: Cascade)
+  tag             Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@map("assessment_choice_tag_weights")
 }
 
 model Company {
@@ -164,6 +176,7 @@ model Tag {
 
   @@unique([name, created_by])
   @@map("tags")
+  AssessmentChoiceTagWeight AssessmentChoiceTagWeight[]
 }
 
 model AssessmentTag {
