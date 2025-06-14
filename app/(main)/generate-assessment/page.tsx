@@ -3,8 +3,8 @@ import getAvailableTags from '@/lib/tags'
 import TagSelector from './TagSelector'
 
 export default async function Page() {
-  const { id: userId } = await requireAuth()
-  const tags = await getAvailableTags(userId)
+  await requireAuth()
+  const tags = await getAvailableTags()
   return (
     <div className='flex flex-col items-center w-full gap-10 px-4 py-12'>
       <div className='text-center'>
