@@ -10,13 +10,13 @@ datasource db {
 }
 
 model Submission {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId       String    @db.Uuid @map("user_id")
-  assessmentId String    @db.Uuid @map("assessment_id")
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String       @map("user_id") @db.Uuid
+  assessmentId String       @map("assessment_id") @db.Uuid
   userAnswers  UserAnswer[]
-  startedAt    DateTime? @db.Timestamptz(6) @map("started_at")
-  completedAt  DateTime? @db.Timestamptz(6) @map("completed_at")
-  createdAt    DateTime? @default(now()) @db.Timestamptz(6) @map("created_at")
+  startedAt    DateTime?    @map("started_at") @db.Timestamptz(6)
+  completedAt  DateTime?    @map("completed_at") @db.Timestamptz(6)
+  createdAt    DateTime?    @default(now()) @map("created_at") @db.Timestamptz(6)
 
   assessment Assessment           @relation(fields: [assessmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user       User                 @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -26,19 +26,18 @@ model Submission {
 }
 
 model UserAnswer {
-  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  submissionId  String   @db.Uuid @map("submission_id")
-  questionId    String @db.Uuid @map("question_id")
-  choiceId      String? @db.Char(1) @map("choice_id")
-  confidence     Float?
-  comment        String?
-  answeredAt    DateTime @db.Timestamptz(6) @map("answered_at")
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  submissionId String   @map("submission_id") @db.Uuid
+  questionId   String   @map("question_id") @db.Uuid
+  choiceId     String?  @map("choice_id") @db.Char(1)
+  confidence   Float?
+  comment      String?
+  answeredAt   DateTime @map("answered_at") @db.Timestamptz(6)
 
-  submission     Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
   @@index([questionId])
-
   @@map("user_answers")
 }
 
@@ -48,63 +47,63 @@ enum QuestionType {
 }
 
 model Assessment {
-  id                          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title                       String   @db.VarChar
-  description                 String?  @db.VarChar
-  questions                   AssessmentQuestion[]
-  timeLimitMinutes          Int?     @db.SmallInt @map("time_limit_minutes")
-  createdBy                  String   @db.Uuid @map("created_by")
-  companyId                  String  @db.Uuid @map("company_id")
-  createdAt                  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt                  DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
+  id               String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title            String               @db.VarChar
+  description      String?              @db.VarChar
+  questions        AssessmentQuestion[]
+  timeLimitMinutes Int?                 @map("time_limit_minutes") @db.SmallInt
+  createdBy        String               @map("created_by") @db.Uuid
+  companyId        String               @map("company_id") @db.Uuid
+  createdAt        DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime             @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   submissions Submission[]
-  user        User            @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  company     Company         @relation(fields: [companyId], references: [id])
+  user        User         @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  company     Company      @relation(fields: [companyId], references: [id])
 
-  tags        AssessmentTag[]
+  tags AssessmentTag[]
 
   @@map("assessments")
 }
 
 model AssessmentQuestion {
-  id           String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  assessment   Assessment        @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  assessmentId String            @db.Uuid @map("assessment_id")
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessmentId String     @map("assessment_id") @db.Uuid
 
-  type         QuestionType
-  question     String            @db.Text
-  choices      AssessmentChoice[]
+  type     QuestionType
+  question String             @db.Text
+  choices  AssessmentChoice[]
 
-  createdAt   DateTime          @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt   DateTime          @default(now()) @db.Timestamptz(6) @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("assessment_questions")
 }
 
 model AssessmentChoice {
-  id           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  question     AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId   String             @db.Uuid @map("question_id")
+  id         String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  question   AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String             @map("question_id") @db.Uuid
 
-  choiceId     String             @db.Char(1) @map("choice_id")
-  label        String             @db.Text
-  tagWeights   AssessmentChoiceTagWeight[]
+  choiceId   String                      @map("choice_id") @db.Char(1)
+  label      String                      @db.Text
+  tagWeights AssessmentChoiceTagWeight[]
 
-  created_at   DateTime           @default(now()) @db.Timestamptz(6)
-  updated_at   DateTime           @default(now()) @db.Timestamptz(6)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
 
   @@map("assessment_choices")
 }
 
 model AssessmentChoiceTagWeight {
-  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  choiceId        String   @db.Uuid @map("choice_id")
-  tagId           String   @db.Uuid @map("tag_id")
-  weight          Float
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  choiceId String @map("choice_id") @db.Uuid
+  tagId    String @map("tag_id") @db.Uuid
+  weight   Float
 
-  choice          AssessmentChoice @relation(fields: [choiceId], references: [id], onDelete: Cascade)
-  tag             Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  choice AssessmentChoice @relation(fields: [choiceId], references: [id], onDelete: Cascade)
+  tag    Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@map("assessment_choice_tag_weights")
 }
@@ -113,8 +112,8 @@ model Company {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String   @db.VarChar(100)
   description String?  @db.VarChar(255)
-  createdAt  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt  DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   users       UserCompany[]
   assessments Assessment[]
@@ -123,15 +122,15 @@ model Company {
 }
 
 model User {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email           String    @unique
-  hashedPassword String? @map("hashed_password")
-  provider        String    @default("credentials")
-  providerId     String? @map("provider_id")
-  name            String?
-  image           String?
-  createdAt      DateTime? @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt      DateTime? @default(now()) @db.Timestamptz(6) @map("updated_at")
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email          String    @unique
+  hashedPassword String?   @map("hashed_password")
+  provider       String    @default("credentials")
+  providerId     String?   @map("provider_id")
+  name           String?
+  image          String?
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   submissions Submission[]
   assessments Assessment[]
@@ -148,9 +147,9 @@ enum Role {
 }
 
 model UserCompany {
-  userId    String @db.Uuid @map("user_id")
-  companyId String @db.Uuid @map("company_id")
-  role       Role   @default(member)
+  userId    String @map("user_id") @db.Uuid
+  companyId String @map("company_id") @db.Uuid
+  role      Role   @default(member)
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -163,23 +162,23 @@ model Tag {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String   @db.VarChar(50)
   description String?  @db.VarChar(255)
-  isPreset   Boolean  @default(false) @map("is_preset")
-  createdBy  String?  @db.Uuid @map("created_by")
-  createdAt  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt  DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
+  isPreset    Boolean  @default(false) @map("is_preset")
+  createdBy   String?  @map("created_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
-  user        User?                @relation(fields: [createdBy], references: [id], onDelete: SetNull)
-  assessments AssessmentTag[]
-  tag_scores  SubmissionTagScore[]
+  user                      User?                       @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  assessments               AssessmentTag[]
+  tag_scores                SubmissionTagScore[]
+  AssessmentChoiceTagWeight AssessmentChoiceTagWeight[]
 
   @@unique([name, createdBy])
   @@map("tags")
-  AssessmentChoiceTagWeight AssessmentChoiceTagWeight[]
 }
 
 model AssessmentTag {
-  assessmentId String @db.Uuid @map("assessment_id")
-  tagId        String @db.Uuid @map("tag_id")
+  assessmentId String @map("assessment_id") @db.Uuid
+  tagId        String @map("tag_id") @db.Uuid
 
   assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   tag        Tag        @relation(fields: [tagId], references: [id], onDelete: Cascade)
@@ -189,13 +188,13 @@ model AssessmentTag {
 }
 
 model SubmissionTagScore {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  submissionId String   @db.Uuid @map("submission_id")
-  tagId        String   @db.Uuid @map("tag_id")
-  total         Int // 関与した設問数
-  correct       Int // 正解数
-  rate          Float // 正答率 (0.0〜1.0)
-  createdAt    DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  submissionId String   @map("submission_id") @db.Uuid
+  tagId        String   @map("tag_id") @db.Uuid
+  total        Int // 関与した設問数
+  correct      Int // 正解数
+  rate         Float // 正答率 (0.0〜1.0)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
   tag        Tag        @relation(fields: [tagId], references: [id], onDelete: Cascade)
