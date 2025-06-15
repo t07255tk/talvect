@@ -98,7 +98,7 @@ export default function AssessmentStartPage({
           router.push('/error') // ← error.tsx（500相当）
       }
     } else {
-      router.push('/completed')
+      router.push(`/assessments/${id}/completed`)
     }
   }
 
