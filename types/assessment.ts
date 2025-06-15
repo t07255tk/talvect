@@ -29,6 +29,7 @@ type EssayQuestionDto = {
 }
 
 type AssessmentChoiceDto = {
+  id: string
   choiceId: string
   label: string
   tagWeights?: AssessmentTagWeightDto[]
@@ -65,6 +66,7 @@ export const toAssessmentQuestionDto = (
       type: question.type,
       question: question.question,
       choices: question.choices.map((choice) => ({
+        id: choice.id,
         choiceId: choice.choiceId,
         label: choice.label,
         tagWeights: choice.tagWeights.map((tw) => ({

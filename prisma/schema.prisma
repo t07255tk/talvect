@@ -26,13 +26,16 @@ model Submission {
 }
 
 model UserAnswer {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  submissionId String   @map("submission_id") @db.Uuid
-  questionId   String   @map("question_id") @db.Uuid
-  choiceId     String?  @map("choice_id") @db.Char(1)
-  confidence   Float?
-  comment      String?
-  answeredAt   DateTime @map("answered_at") @db.Timestamptz(6)
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  submissionId String @map("submission_id") @db.Uuid
+
+  question   AssessmentQuestion @relation(fields: [questionId], references: [id])
+  questionId String             @map("question_id") @db.Uuid
+  choice     AssessmentChoice?  @relation(fields: [choiceId], references: [id])
+  choiceId   String?            @map("choice_id") @db.Uuid
+  confidence Float?
+  comment    String?
+  answeredAt DateTime           @map("answered_at") @db.Timestamptz(6)
 
   submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
@@ -78,6 +81,8 @@ model AssessmentQuestion {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
+  userAnswers UserAnswer[]
+
   @@map("assessment_questions")
 }
 
@@ -92,6 +97,8 @@ model AssessmentChoice {
 
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  userAnswers UserAnswer[]
 
   @@map("assessment_choices")
 }
