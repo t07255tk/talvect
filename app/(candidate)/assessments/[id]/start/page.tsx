@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { getNowByServer, setServerTime } from '@/lib/utils/time'
 import { isValidUUID } from '@/lib/validation'
-import { Answers, Choice } from '@/lib/validation/assessmentSchema'
+import { Answers } from '@/lib/validation/assessmentSchema'
 import { AssessmentDto } from '@/types/assessment'
 
 export default function AssessmentStartPage({
@@ -26,13 +26,22 @@ export default function AssessmentStartPage({
 
   useEffect(() => {
     fetch(`/api/assessments/${id}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          if (res.status === 404) {
+            router.push('/not-found')
+          } else {
+            throw new Error(`Failed to fetch assessment: ${res.statusText}`)
+          }
+        }
+        return res.json()
+      })
       .then((data) => {
         setAssessment(data.assessment)
         setServerTime(data.serverTime) // サーバー時刻を初期化
       })
       .then(() => setLoading(false))
-  }, [id])
+  }, [id, router])
 
   if (loading || !assessment) return <div className='p-6'>Loading...</div>
 
@@ -64,14 +73,33 @@ export default function AssessmentStartPage({
       return
     }
 
-    await fetch(`/api/assessments/${assessment.id}/submit`, {
+    const res = await fetch(`/api/assessments/${assessment.id}/submit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ answers }),
     })
-    router.push('/completed')
+    if (!res.ok) {
+      switch (res.status) {
+        case 400:
+          alert('Invalid answers. Please complete all required questions.')
+          break
+        case 403:
+          router.push('/forbidden') // ← Optional: 権限なしページ
+          break
+        case 401:
+          router.push('/login') // or 強制ログアウト処理
+          break
+        case 409:
+          alert('You have already submitted this assessment.')
+          break
+        default:
+          router.push('/error') // ← error.tsx（500相当）
+      }
+    } else {
+      router.push('/completed')
+    }
   }
 
   const hasAnsweredCurrent = answers.some(
@@ -97,7 +125,7 @@ export default function AssessmentStartPage({
                 key={choice.choiceId}
                 className='flex items-center space-x-3'
               >
-                <RadioGroupItem value={choice.choiceId} id={choice.choiceId} />
+                <RadioGroupItem value={choice.id} id={choice.choiceId} />
                 <Label htmlFor={choice.choiceId}>{choice.label}</Label>
               </div>
             ))}
