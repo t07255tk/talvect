@@ -1,8 +1,8 @@
 import Link from 'next/link'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getAssessments } from '@/lib/assessment'
 import { requireAuth } from '@/lib/requreAuth'
-import { Badge } from '@/components/ui/badge'
 
 export default async function Page() {
   const user = await requireAuth()
@@ -24,29 +24,35 @@ export default async function Page() {
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {assessments.map((a) => (
-            <Link
+            <div
               key={a.id}
-              href={`/assessments/${a.id}`}
-              className='border rounded-xl p-4 hover:bg-accent transition block'
+              className='border rounded-xl p-4 hover:bg-accent transition flex flex-col justify-between'
             >
-              <div className='text-lg font-semibold line-clamp-1'>
-                {a.title?.trim() || '(Untitled Assessment)'}
+              <Link href={`/assessments/${a.id}`} className='block'>
+                <div className='text-lg font-semibold line-clamp-1'>
+                  {a.title?.trim() || '(Untitled Assessment)'}
+                </div>
+                <div className='flex flex-wrap items-center gap-2 mt-2'>
+                  {a.tags.map((t) => (
+                    <Badge key={t.id} variant='secondary'>
+                      {t.name}
+                    </Badge>
+                  ))}
+                </div>
+                <div className='text-sm text-muted-foreground mt-1 line-clamp-2'>
+                  {a.description?.trim() || 'No description'}
+                </div>
+              </Link>
+              <div className='flex justify-between items-center mt-4 text-xs text-muted-foreground'>
+                <span>Created: {new Date(a.createdAt).toLocaleString()}</span>
+                <Link
+                  href={`/assessments/${a.id}/results`}
+                  className='text-blue-600 hover:underline font-medium'
+                >
+                  View Results →
+                </Link>
               </div>
-              <div className='flex flex-wrap items-center gap-2 mt-2'>
-                {a.tags.map((t) => (
-                  <Badge key={t.id} variant='secondary'>
-                    {t.name}
-                  </Badge>
-                ))}
-              </div>
-
-              <div className='text-sm text-muted-foreground mt-1 line-clamp-2'>
-                {a.description?.trim() || 'No description'}
-              </div>
-              <div className='text-xs text-right text-gray-500 mt-4'>
-                Created: {new Date(a.createdAt).toLocaleString()}
-              </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

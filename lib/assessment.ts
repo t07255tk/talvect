@@ -143,24 +143,13 @@ export async function generateAssessment(
   }
 }
 
-export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
+export async function getAssessments(
+  userId: string,
+): Promise<Omit<AssessmentDto, 'questions'>[]> {
   const assessments = await prisma.assessment.findMany({
     where: { createdBy: userId },
     orderBy: { createdAt: 'desc' },
     include: {
-      questions: {
-        include: {
-          choices: {
-            include: {
-              tagWeights: {
-                include: {
-                  tag: true,
-                },
-              },
-            },
-          },
-        },
-      },
       tags: {
         include: {
           tag: true,
@@ -173,9 +162,6 @@ export async function getAssessments(userId: string): Promise<AssessmentDto[]> {
     id: assessment.id,
     title: assessment.title,
     description: assessment.description || undefined,
-    questions: assessment.questions.map((q) => {
-      return toAssessmentQuestionDto(q)
-    }),
     createdAt: assessment.createdAt.toISOString(),
     tags: assessment.tags.map((at) => ({
       id: at.tag.id,
