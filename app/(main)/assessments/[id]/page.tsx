@@ -76,7 +76,7 @@ export default async function AssessmentDetailPage({
                                       key={tw.tagId}
                                       className={getBadgeClass(tw.weight)}
                                     >
-                                      {tw.name}
+                                      {tw.name}: {tw.weight.toFixed(2)}
                                     </Badge>
                                   )
                                 })}
