@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { getAssessments } from '@/lib/assessment'
-import { requireAuth } from '@/lib/requreAuth'
 import { getCompanyForUser } from '@/lib/company'
+import { requireAuth } from '@/lib/requreAuth'
 import { createCompanyAndAssignUser } from '@/lib/user'
 
 export default async function Page() {
@@ -51,9 +51,6 @@ export default async function Page() {
                 <div className='text-lg font-semibold'>{a.title}</div>
                 <div className='text-sm text-muted-foreground'>
                   {a.description || 'No description'}
-                </div>
-                <div className='text-xs text-right text-gray-500'>
-                  {a.questions.length} questions
                 </div>
               </Link>
             ))}
