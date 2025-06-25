@@ -54,11 +54,13 @@ export async function getSubmissions(
               },
             },
           },
-          choice: {
+          userAnswerChoices: {
             include: {
-              tagWeights: {
+              choice: {
                 include: {
-                  tag: true,
+                  tagWeights: {
+                    include: { tag: true },
+                  },
                 },
               },
             },
@@ -113,13 +115,7 @@ export async function getSubmissionById(submissionId: string) {
               },
             },
           },
-          choice: {
-            include: {
-              tagWeights: {
-                include: { tag: true },
-              },
-            },
-          },
+          userAnswerChoices: true,
         },
       },
     },

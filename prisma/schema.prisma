@@ -20,7 +20,7 @@ model Submission {
 
   assessment Assessment           @relation(fields: [assessmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user       User                 @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  tag_scores SubmissionTagScore[]
+  tagScores  SubmissionTagScore[]
 
   @@map("submissions")
 }
@@ -29,19 +29,31 @@ model UserAnswer {
   id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   submissionId String @map("submission_id") @db.Uuid
 
-  question   AssessmentQuestion @relation(fields: [questionId], references: [id])
-  questionId String             @map("question_id") @db.Uuid
-  choice     AssessmentChoice?  @relation(fields: [choiceId], references: [id])
-  choiceId   String?            @map("choice_id") @db.Uuid
-  confidence Float?
-  comment    String?
-  answeredAt DateTime           @map("answered_at") @db.Timestamptz(6)
-
-  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  question          AssessmentQuestion @relation(fields: [questionId], references: [id])
+  questionId        String             @map("question_id") @db.Uuid
+  userAnswerChoices UserAnswerChoice[]
+  choiceId          String?            @map("choice_id") @db.Uuid
+  confidence        Float?
+  comment           String?
+  answeredAt        DateTime           @map("answered_at") @db.Timestamptz(6)
+  submission        Submission         @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
   @@index([questionId])
   @@map("user_answers")
+}
+
+model UserAnswerChoice {
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userAnswerId String @map("user_answer_id") @db.Uuid
+  choiceId     String @map("choice_id") @db.Uuid
+
+  userAnswer UserAnswer       @relation(fields: [userAnswerId], references: [id], onDelete: Cascade)
+  choice     AssessmentChoice @relation(fields: [choiceId], references: [id], onDelete: Cascade)
+  orderIndex Int              @map("order_index")
+
+  @@unique([userAnswerId, choiceId])
+  @@map("user_answer_choices")
 }
 
 enum QuestionType {
@@ -91,14 +103,13 @@ model AssessmentChoice {
   question   AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionId String             @map("question_id") @db.Uuid
 
-  choiceId   String                      @map("choice_id") @db.Char(1)
-  label      String                      @db.Text
-  tagWeights AssessmentChoiceTagWeight[]
+  choiceId          String                      @map("choice_id") @db.Char(1)
+  label             String                      @db.Text
+  tagWeights        AssessmentChoiceTagWeight[]
+  userAnswerChoices UserAnswerChoice[]
 
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
-
-  userAnswers UserAnswer[]
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("assessment_choices")
 }
