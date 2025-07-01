@@ -40,10 +40,13 @@ export type Choice = z.infer<typeof ChoiceSchema>
 export type AssessmentItem = z.infer<typeof AssessmentItemSchema>
 export type Assessment = z.infer<typeof AssessmentSchema>
 
+const SelectedChoiceSchema = z.object({
+  choiceId: z.string(),
+  orderIndex: z.number().int().min(0).max(3).optional(),
+})
 export const AnswerSchema = z.object({
   questionId: z.string().uuid(),
-  choiceId: z.string().uuid(),
-  answeredAt: z.string().datetime(),
+  selectedChoices: z.array(SelectedChoiceSchema).optional(),
 })
 
 export const AnswersSchema = z.array(AnswerSchema)

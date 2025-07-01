@@ -53,28 +53,25 @@ export default async function SubmissionDetailPage({ params }: Props) {
         {submission.userAnswers.map((ua) => (
           <Card key={ua.id} className='p-4 space-y-2'>
             <div className='font-medium'>{ua.question.question}</div>
-            {ua.question.choices?.map((c) => {
-              const isSelected = c.id === ua.choice?.id
-              return (
-                <div key={c.id} className='ml-2'>
-                  <div className='flex items-center gap-2'>
-                    <span className='font-medium'>
-                      {isSelected ? '✅' : '⬜'} {c.label}
-                    </span>
-                    <div className='flex flex-wrap gap-1'>
-                      {c.tagWeights?.map((tw) => (
-                        <Badge
-                          key={tw.tag.id}
-                          className={getBadgeClass(tw.weight)}
-                        >
-                          {tw.tag.name}: {tw.weight.toFixed(2)}
-                        </Badge>
-                      ))}
-                    </div>
+            {ua.userAnswerChoices?.map((c) => (
+              <div key={c.id} className='ml-2'>
+                <div className='flex items-center gap-2'>
+                  <span className='font-medium'>
+                    {c.orderIndex + 1}: {c.choice.label}
+                  </span>
+                  <div className='flex flex-wrap gap-1'>
+                    {c.choice.tagWeights?.map((tw) => (
+                      <Badge
+                        key={tw.tag.id}
+                        className={getBadgeClass(tw.weight)}
+                      >
+                        {tw.tag.name}: {tw.weight.toFixed(2)}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </Card>
         ))}
       </section>

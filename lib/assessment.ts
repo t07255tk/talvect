@@ -92,7 +92,7 @@ export async function generateAssessment(
           companyId: createdUser.companyId!,
           questions: {
             create: questions.map((q) => {
-              if (q.type === 'MULTIPLE_CHOICE_SINGLE') {
+              if (q.type === 'MULTIPLE_CHOICE_ORDERED') {
                 return {
                   type: q.type,
                   question: q.question,
