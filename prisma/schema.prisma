@@ -32,10 +32,8 @@ model UserAnswer {
   question          AssessmentQuestion @relation(fields: [questionId], references: [id])
   questionId        String             @map("question_id") @db.Uuid
   userAnswerChoices UserAnswerChoice[]
-  choiceId          String?            @map("choice_id") @db.Uuid
   confidence        Float?
   comment           String?
-  answeredAt        DateTime           @map("answered_at") @db.Timestamptz(6)
   submission        Submission         @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
