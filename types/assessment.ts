@@ -17,7 +17,7 @@ export type AssessmentDto = {
 type AssessmentQuestionDto = MultipleChoiceQuestionDto | EssayQuestionDto
 type MultipleChoiceQuestionDto = {
   id?: string
-  type: 'MULTIPLE_CHOICE_SINGLE'
+  type: 'MULTIPLE_CHOICE_ORDERED'
   question: string
   choices: AssessmentChoiceDto[]
 }
@@ -60,7 +60,7 @@ type Question = {
 export const toAssessmentQuestionDto = (
   question: Question,
 ): AssessmentQuestionDto => {
-  if (question.type === 'MULTIPLE_CHOICE_SINGLE') {
+  if (question.type === 'MULTIPLE_CHOICE_ORDERED') {
     return {
       id: question.id,
       type: question.type,

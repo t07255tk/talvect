@@ -81,7 +81,7 @@ Output format:
 - Each item must follow this structure:
 [
   {
-    "type": "MULTIPLE_CHOICE_SINGLE",
+    "type": "MULTIPLE_CHOICE_ORDERED",
     "question": "...",
     "choices": [
       {

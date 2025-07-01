@@ -30,7 +30,7 @@ export async function generateQuestions(
         {
           role: 'system',
           content:
-            'You are a strict and self-correcting exam generator. You create nuanced, realistic MULTIPLE_CHOICE_SINGLE questions that challenge judgment, not recall. You always internally review your own output to eliminate idealized answers or weak distractors before returning the final result.',
+            'You are a strict and self-correcting exam generator. You create nuanced, realistic MULTIPLE_CHOICE_ORDERED questions that challenge judgment, not recall. You always internally review your own output to eliminate idealized answers or weak distractors before returning the final result.',
         },
         {
           role: 'user',

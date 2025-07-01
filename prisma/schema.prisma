@@ -57,7 +57,7 @@ model UserAnswerChoice {
 }
 
 enum QuestionType {
-  MULTIPLE_CHOICE_SINGLE
+  MULTIPLE_CHOICE_ORDERED
   ESSAY
 }
 

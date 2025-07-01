@@ -10,7 +10,7 @@ export const ChoiceSchema = z.object({
 
 export const MultipleChoiceItemSchema = z.object({
   id: z.string().optional(), // Optional ID for questions, can be generated later
-  type: z.literal('MULTIPLE_CHOICE_SINGLE'),
+  type: z.literal('MULTIPLE_CHOICE_ORDERED'),
   question: z.string(),
   choices: z.array(ChoiceSchema).length(4),
 })

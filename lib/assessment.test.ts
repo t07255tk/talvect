@@ -28,7 +28,7 @@ const mockCreate = vi.fn().mockResolvedValue({
       message: {
         content: JSON.stringify([
           {
-            type: 'MULTIPLE_CHOICE_SINGLE',
+            type: 'MULTIPLE_CHOICE_ORDERED',
             question: 'What is 2+2?',
             choices: [
               {
@@ -137,7 +137,7 @@ describe('generateAssessment', () => {
                 message: {
                   content: JSON.stringify([
                     {
-                      type: 'MULTIPLE_CHOICE_SINGLE',
+                      type: 'MULTIPLE_CHOICE_ORDERED',
                       question: 'What is 2+2?',
                       choices: [
                         {
@@ -177,7 +177,7 @@ describe('generateAssessment', () => {
 
     const mockGenerateQuestions = vi.fn().mockResolvedValue([
       {
-        type: 'MULTIPLE_CHOICE_SINGLE',
+        type: 'MULTIPLE_CHOICE_ORDERED',
         question: 'What is 2+2?',
         choices: [
           {

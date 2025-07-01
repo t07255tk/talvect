@@ -57,7 +57,7 @@ export default async function AssessmentDetailPage({
               Q{i + 1}. {q.question}
             </h2>
 
-            {q.type === 'MULTIPLE_CHOICE_SINGLE' &&
+            {q.type === 'MULTIPLE_CHOICE_ORDERED' &&
               Array.isArray(q.choices) && (
                 <>
                   <ul className='mt-2 list-none text-sm text-muted-foreground space-y-1'>
